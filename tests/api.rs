@@ -17,7 +17,149 @@ fn print_bytes(bytes: &[u8]) {
 }
 
 #[test]
-fn test_styling() {
+fn test_readme_code() {
+	let v = &mut Vec::new();
+	write!(
+		v,
+		"Hello, {}{}{}{}{}{}",
+		"w".white().on_red(),
+		"o".cyan().on_green(),
+		"r".magenta().on_yellow(),
+		"l".blue().on_white(),
+		"d".yellow().on_bright_cyan(),
+		"!".bright_red().on_bright_yellow(),
+	)
+	.unwrap();
+
+	let result = categorise_text(&v); // cansi function
+
+	assert_eq!(result.len(), 7); // there should be seven differently styled components
+
+	assert_eq!(
+		b"Hello, world!",
+		&result
+			.iter()
+			.flat_map(|r| r.text)
+			.map(|x| *x)
+			.collect::<Vec<_>>()[..]
+	);
+
+	// 'Hello, ' is just defaults
+	assert_eq!(
+		result[0],
+		CategorisedSlice {
+			text: b"Hello, ",
+			fg_colour: Color::White,
+			bg_colour: Color::Black,
+			intensity: Intensity::Normal,
+			italic: false,
+			underline: false,
+			blink: false,
+			reversed: false,
+			hidden: false,
+			strikethrough: false
+		}
+	);
+
+	assert_eq!(
+		result[1],
+		CategorisedSlice {
+			text: b"w",
+			fg_colour: Color::White,
+			bg_colour: Color::Red,
+			intensity: Intensity::Normal,
+			italic: false,
+			underline: false,
+			blink: false,
+			reversed: false,
+			hidden: false,
+			strikethrough: false
+		}
+	);
+
+	assert_eq!(
+		result[2],
+		CategorisedSlice {
+			text: b"o",
+			fg_colour: Color::Cyan,
+			bg_colour: Color::Green,
+			intensity: Intensity::Normal,
+			italic: false,
+			underline: false,
+			blink: false,
+			reversed: false,
+			hidden: false,
+			strikethrough: false
+		}
+	);
+
+	assert_eq!(
+		result[3],
+		CategorisedSlice {
+			text: b"r",
+			fg_colour: Color::Magenta,
+			bg_colour: Color::Yellow,
+			intensity: Intensity::Normal,
+			italic: false,
+			underline: false,
+			blink: false,
+			reversed: false,
+			hidden: false,
+			strikethrough: false
+		}
+	);
+
+	assert_eq!(
+		result[4],
+		CategorisedSlice {
+			text: b"l",
+			fg_colour: Color::Blue,
+			bg_colour: Color::White,
+			intensity: Intensity::Normal,
+			italic: false,
+			underline: false,
+			blink: false,
+			reversed: false,
+			hidden: false,
+			strikethrough: false
+		}
+	);
+
+	assert_eq!(
+		result[5],
+		CategorisedSlice {
+			text: b"d",
+			fg_colour: Color::Yellow,
+			bg_colour: Color::BrightCyan,
+			intensity: Intensity::Normal,
+			italic: false,
+			underline: false,
+			blink: false,
+			reversed: false,
+			hidden: false,
+			strikethrough: false
+		}
+	);
+
+	assert_eq!(
+		result[6],
+		CategorisedSlice {
+			text: b"!",
+			fg_colour: Color::BrightRed,
+			bg_colour: Color::BrightYellow,
+			intensity: Intensity::Normal,
+			italic: false,
+			underline: false,
+			blink: false,
+			reversed: false,
+			hidden: false,
+			strikethrough: false
+		}
+	);
+}
+
+#[test]
+fn test_colored_function() {
 	let test_string: &[u8] = b"test";
 	let v = &mut Vec::new();
 
