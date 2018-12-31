@@ -1,24 +1,26 @@
 //! # cansi
-//!
+//! 
 //! [![Build Status](https://travis-ci.com/kurtlawrence/cansi.svg?branch=master)](https://travis-ci.com/kurtlawrence/cansi) [![Latest Version](https://img.shields.io/crates/v/cansi.svg)](https://crates.io/crates/cansi) [![Rust Documentation](https://img.shields.io/badge/api-rustdoc-blue.svg)](https://docs.rs/cansi) [![codecov](https://codecov.io/gh/kurtlawrence/cansi/branch/master/graph/badge.svg)](https://codecov.io/gh/kurtlawrence/cansi)
-//!
+//! 
 //! ## **C**atergorise **ANSI** - ANSI escape code parser and categoriser
-//!
+//! 
 //! See the [rs docs.](https://docs.rs/cansi/)
 //! Look at progress and contribute on [github.](https://github.com/kurtlawrence/cansi)
-//!
-//! `cansi` will parse text with ANSI escape sequences in it and return a deconstructed text with metadata around the colouring and styling. `cansi` is only concerned with `CSI` sequences, particuarly the `SGR` parameters. `cansi` will not constructed escaped text, there are crates such as [colored](https://crates.io/crates/colored) that do a great job of colouring and styling text.
-//!
+//! 
+//! `cansi` will parse text with ANSI escape sequences in it and return a deconstructed text with metadata around the colouring and styling. `cansi` is only concerned with `CSI` sequences, particuarly the `SGR` parameters. `cansi` will not construct escaped text, there are crates such as [`colored`](https://crates.io/crates/colored) that do a great job of colouring and styling text.
+//! 
 //! ## Example usage
-//!
+//! 
+//! > This example was done using the `colored` crate to help with constructing the escaped text string. It will work with other tools that inject escape sequences into text strings (given they follow [ANSI specification](https://en.wikipedia.org/wiki/ANSI_escape_code)).
+//! 
 //! ```rust
 //! extern crate cansi;
 //! extern crate colored;
-//!
+//! 
 //! use cansi::*;
 //! use colored::*;
 //! use std::io::Write;
-//!
+//! 
 //! let v = &mut Vec::new();
 //! write!(
 //!   v,
@@ -31,25 +33,19 @@
 //!   "!".bright_red().on_bright_yellow(),
 //! )
 //! .unwrap();
-//!
-//! let result = categorise_text(&v); // cansi function
-//!
+//! 
+//! let text = String::from_utf8_lossy(&v);
+//! let result = categorise_text(&text); // cansi function
+//! 
 //! assert_eq!(result.len(), 7); // there should be seven differently styled components
-//!
-//! assert_eq!(
-//!     b"Hello, world!",
-//!     &result
-//!       .iter()
-//!       .flat_map(|r| r.text)
-//!       .map(|x| *x)
-//!       .collect::<Vec<_>>()[..]
-//!   );
-//!
+//! 
+//! assert_eq!("Hello, world!", &construct_text_no_codes(&result));
+//! 
 //! // 'Hello, ' is just defaults
 //! assert_eq!(
 //!   result[0],
 //!   CategorisedSlice {
-//!     text: b"Hello, ",
+//!     text_as_bytes: b"Hello, ",
 //!     fg_colour: Color::White,
 //!     bg_colour: Color::Black,
 //!     intensity: Intensity::Normal,
@@ -61,12 +57,12 @@
 //!     strikethrough: false
 //!   }
 //! );
-//!
+//! 
 //! // 'w' is coloured differently
 //! assert_eq!(
 //!   result[1],
 //!   CategorisedSlice {
-//!     text: b"w",
+//!     text_as_bytes: b"w",
 //!     fg_colour: Color::White,
 //!     bg_colour: Color::Red,
 //!     intensity: Intensity::Normal,
@@ -79,30 +75,55 @@
 //!   }
 //! );
 //! ```
-//!
-//! > **Note**
-//! >
-//! > The example was done using the `colored` crate to help with constructing the escaped text string. It will work with other tools that inject escape sequences into text strings.
 extern crate colored;
 extern crate parse_ansi;
 
 #[cfg(test)]
 mod tests;
 
+/// Re-export of [colored::Color](https://docs.rs/colored/1.6.1/colored/enum.Color.html).
 pub use self::colored::Color;
 
 const SEPARATOR: u8 = b';';
 
-pub fn categorise_text(text: &[u8]) -> Vec<CategorisedSlice> {
+/// Type definition of the collection of `CategorisedSlice`s.
+pub type CategorisedSlices<'text> = Vec<CategorisedSlice<'text>>;
+
+/// Constructs a string of the categorised text without the ANSI escape characters.
+///
+/// # Example
+/// ```rust
+/// use cansi::*;
+/// let categorised = categorise_text("\x1b[30mH\x1b[31me\x1b[32ml\x1b[33ml\x1b[34mo");
+/// assert_eq!("Hello", &construct_text_no_codes(&categorised));
+/// ```
+pub fn construct_text_no_codes(categorised_slices: &CategorisedSlices) -> String {
+	String::from_utf8_lossy(
+		&categorised_slices
+			.iter()
+			.flat_map(|r| r.text_as_bytes)
+			.map(|x| *x)
+			.collect::<Vec<_>>()[..],
+	)
+	.into_owned()
+}
+
+/// Parses the text and returns each formatted slice in order.
+/// The ANSI escape codes are not included in the text slices.
+///
+/// Each different text slice is returned in order such that the text without the escape characters can be reconstructed.
+/// There is a helper function (`construct_text_no_codes`) on `CategorisedSlices` for this.
+pub fn categorise_text(text: &str) -> CategorisedSlices {
 	let mut sgr = SGR::default();
 	let mut lo = 0;
 	let mut slices: Vec<CategorisedSlice> = Vec::new();
+	let text = text.as_bytes();
 	for m in parse_ansi::parse_bytes(text) {
 		// add in the text before CSI with the previous SGR format
 		let hi = m.start();
 		if hi != lo {
 			slices.push(CategorisedSlice {
-				text: &text[lo..hi],
+				text_as_bytes: &text[lo..hi],
 				fg_colour: sgr.fg_colour,
 				bg_colour: sgr.bg_colour,
 				intensity: sgr.intensity.clone(),
@@ -191,7 +212,7 @@ pub fn categorise_text(text: &[u8]) -> Vec<CategorisedSlice> {
 
 	if lo != text.len() {
 		slices.push(CategorisedSlice {
-			text: &text[lo..text.len()],
+			text_as_bytes: &text[lo..text.len()],
 			fg_colour: sgr.fg_colour,
 			bg_colour: sgr.bg_colour,
 			intensity: sgr.intensity.clone(),
@@ -207,20 +228,33 @@ pub fn categorise_text(text: &[u8]) -> Vec<CategorisedSlice> {
 	slices
 }
 
+/// Data structure that holds information about colouring and styling of a text slice.
 #[derive(Debug, PartialEq)]
-pub struct CategorisedSlice<'a> {
-	pub text: &'a [u8],
+pub struct CategorisedSlice<'text> {
+	/// The text slice as a byte array.
+	///
+	/// # Note
+	/// Once the crate [`parse-ansi`](https://crates.io/crates/parse-ansi) moves to [`regex`](https://crates.io/crates/regex) crate `1.1.0` it will be possible to return a string slice (`&str`).
+	pub text_as_bytes: &'text [u8],
+	/// The foreground (or text) colour.
 	pub fg_colour: Color,
+	/// The background colour.
 	pub bg_colour: Color,
+	/// The emphasis state (bold, faint, normal).
 	pub intensity: Intensity,
 	pub italic: bool,
 	pub underline: bool,
+	/// Slow blink text.
 	pub blink: bool,
+	/// Inverted colours. See [https://en.wikipedia.org/wiki/Reverse_video](https://en.wikipedia.org/wiki/Reverse_video).
 	pub reversed: bool,
+	/// Invisible text.
 	pub hidden: bool,
 	pub strikethrough: bool,
 }
 
+/// The formatting components `SGR (Select Graphic Rendition)`.
+/// [spec](https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters)
 struct SGR {
 	fg_colour: Color,
 	bg_colour: Color,
@@ -233,6 +267,7 @@ struct SGR {
 	strikethrough: bool,
 }
 
+/// The emphasis (bold, faint) states.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Intensity {
 	Normal,

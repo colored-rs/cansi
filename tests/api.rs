@@ -31,24 +31,18 @@ fn test_readme_code() {
 	)
 	.unwrap();
 
-	let result = categorise_text(&v); // cansi function
+	let text = String::from_utf8_lossy(&v);
+	let result = categorise_text(&text); // cansi function
 
 	assert_eq!(result.len(), 7); // there should be seven differently styled components
 
-	assert_eq!(
-		b"Hello, world!",
-		&result
-			.iter()
-			.flat_map(|r| r.text)
-			.map(|x| *x)
-			.collect::<Vec<_>>()[..]
-	);
+	assert_eq!("Hello, world!", &construct_text_no_codes(&result));
 
 	// 'Hello, ' is just defaults
 	assert_eq!(
 		result[0],
 		CategorisedSlice {
-			text: b"Hello, ",
+			text_as_bytes: b"Hello, ",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -64,7 +58,7 @@ fn test_readme_code() {
 	assert_eq!(
 		result[1],
 		CategorisedSlice {
-			text: b"w",
+			text_as_bytes: b"w",
 			fg_colour: Color::White,
 			bg_colour: Color::Red,
 			intensity: Intensity::Normal,
@@ -80,7 +74,7 @@ fn test_readme_code() {
 	assert_eq!(
 		result[2],
 		CategorisedSlice {
-			text: b"o",
+			text_as_bytes: b"o",
 			fg_colour: Color::Cyan,
 			bg_colour: Color::Green,
 			intensity: Intensity::Normal,
@@ -96,7 +90,7 @@ fn test_readme_code() {
 	assert_eq!(
 		result[3],
 		CategorisedSlice {
-			text: b"r",
+			text_as_bytes: b"r",
 			fg_colour: Color::Magenta,
 			bg_colour: Color::Yellow,
 			intensity: Intensity::Normal,
@@ -112,7 +106,7 @@ fn test_readme_code() {
 	assert_eq!(
 		result[4],
 		CategorisedSlice {
-			text: b"l",
+			text_as_bytes: b"l",
 			fg_colour: Color::Blue,
 			bg_colour: Color::White,
 			intensity: Intensity::Normal,
@@ -128,7 +122,7 @@ fn test_readme_code() {
 	assert_eq!(
 		result[5],
 		CategorisedSlice {
-			text: b"d",
+			text_as_bytes: b"d",
 			fg_colour: Color::Yellow,
 			bg_colour: Color::BrightCyan,
 			intensity: Intensity::Normal,
@@ -144,7 +138,7 @@ fn test_readme_code() {
 	assert_eq!(
 		result[6],
 		CategorisedSlice {
-			text: b"!",
+			text_as_bytes: b"!",
 			fg_colour: Color::BrightRed,
 			bg_colour: Color::BrightYellow,
 			intensity: Intensity::Normal,
@@ -166,9 +160,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".black()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::Black,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -185,9 +179,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".red()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::Red,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -204,9 +198,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".green()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::Green,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -223,9 +217,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".yellow()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::Yellow,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -242,9 +236,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".blue()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::Blue,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -261,9 +255,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".magenta()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::Magenta,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -280,9 +274,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".purple()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::Magenta,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -299,9 +293,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".cyan()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::Cyan,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -318,9 +312,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".white()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -337,9 +331,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bright_black()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::BrightBlack,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -356,9 +350,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bright_red()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::BrightRed,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -375,9 +369,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bright_green()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::BrightGreen,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -394,9 +388,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bright_yellow()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::BrightYellow,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -413,9 +407,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bright_blue()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::BrightBlue,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -432,9 +426,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bright_magenta()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::BrightMagenta,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -451,9 +445,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bright_purple()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::BrightMagenta,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -470,9 +464,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bright_cyan()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::BrightCyan,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -489,9 +483,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bright_white()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::BrightWhite,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -508,9 +502,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_black()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -527,9 +521,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_red()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Red,
 			intensity: Intensity::Normal,
@@ -546,9 +540,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_green()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Green,
 			intensity: Intensity::Normal,
@@ -565,9 +559,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_yellow()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Yellow,
 			intensity: Intensity::Normal,
@@ -584,9 +578,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_blue()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Blue,
 			intensity: Intensity::Normal,
@@ -603,9 +597,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_magenta()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Magenta,
 			intensity: Intensity::Normal,
@@ -622,9 +616,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_purple()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Magenta,
 			intensity: Intensity::Normal,
@@ -641,9 +635,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_cyan()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Cyan,
 			intensity: Intensity::Normal,
@@ -660,9 +654,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_white()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::White,
 			intensity: Intensity::Normal,
@@ -679,9 +673,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_bright_black()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::BrightBlack,
 			intensity: Intensity::Normal,
@@ -698,9 +692,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_bright_red()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::BrightRed,
 			intensity: Intensity::Normal,
@@ -717,9 +711,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_bright_green()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::BrightGreen,
 			intensity: Intensity::Normal,
@@ -736,9 +730,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_bright_yellow()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::BrightYellow,
 			intensity: Intensity::Normal,
@@ -755,9 +749,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_bright_blue()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::BrightBlue,
 			intensity: Intensity::Normal,
@@ -774,9 +768,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_bright_magenta()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::BrightMagenta,
 			intensity: Intensity::Normal,
@@ -793,9 +787,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_bright_purple()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::BrightMagenta,
 			intensity: Intensity::Normal,
@@ -812,9 +806,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_bright_cyan()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::BrightCyan,
 			intensity: Intensity::Normal,
@@ -831,9 +825,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".on_bright_white()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::BrightWhite,
 			intensity: Intensity::Normal,
@@ -850,9 +844,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".clear()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -869,9 +863,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".normal()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -888,9 +882,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".bold()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Bold,
@@ -907,9 +901,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".dimmed()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Faint,
@@ -926,9 +920,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".italic()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -945,9 +939,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".underline()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -964,9 +958,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".blink()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -983,9 +977,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".reverse()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -1002,9 +996,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".reversed()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -1021,9 +1015,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".hidden()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -1040,9 +1034,9 @@ fn test_colored_function() {
 	write!(v, "{}", "test".strikethrough()).unwrap();
 	print_bytes(&v);
 	assert_eq!(
-		categorise_text(&v)[0],
+		categorise_text(&String::from_utf8_lossy(&v))[0],
 		CategorisedSlice {
-			text: test_string,
+			text_as_bytes: test_string,
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,

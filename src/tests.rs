@@ -5,11 +5,11 @@ fn cover_other_parameters() {
 	// colored doesn't always test all match arms, so i test here
 
 	// no escape sequences
-	let text = b"test";
+	let text = "test";
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -23,11 +23,11 @@ fn cover_other_parameters() {
 	);
 
 	// empty sequences
-	let text = b"\x1b[;mtest";
+	let text = "\x1b[;mtest";
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -41,12 +41,12 @@ fn cover_other_parameters() {
 	);
 
 	// empty text - doesn't add it
-	let text = b"\x1b[;mtest\x1b[;m\x1b[;m";
+	let text = "\x1b[;mtest\x1b[;m\x1b[;m";
 	assert_eq!(categorise_text(&text[..]).len(), 1);
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -60,11 +60,11 @@ fn cover_other_parameters() {
 	);
 
 	// 22
-	let text = b"\x1b[1;22mtest";
+	let text = "\x1b[1;22mtest";
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -78,11 +78,11 @@ fn cover_other_parameters() {
 	);
 
 	// 23
-	let text = b"\x1b[3;23mtest";
+	let text = "\x1b[3;23mtest";
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -96,11 +96,11 @@ fn cover_other_parameters() {
 	);
 
 	// 24
-	let text = b"\x1b[4;24mtest";
+	let text = "\x1b[4;24mtest";
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -114,11 +114,11 @@ fn cover_other_parameters() {
 	);
 
 	// 25
-	let text = b"\x1b[5;25mtest";
+	let text = "\x1b[5;25mtest";
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -132,11 +132,11 @@ fn cover_other_parameters() {
 	);
 
 	// 27
-	let text = b"\x1b[7;27mtest";
+	let text = "\x1b[7;27mtest";
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -150,11 +150,11 @@ fn cover_other_parameters() {
 	);
 
 	// 28
-	let text = b"\x1b[8;28mtest";
+	let text = "\x1b[8;28mtest";
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,
@@ -168,11 +168,11 @@ fn cover_other_parameters() {
 	);
 
 	// 29
-	let text = b"\x1b[9;29mtest";
+	let text = "\x1b[9;29mtest";
 	assert_eq!(
 		categorise_text(&text[..])[0],
 		CategorisedSlice {
-			text: b"test",
+			text_as_bytes: b"test",
 			fg_colour: Color::White,
 			bg_colour: Color::Black,
 			intensity: Intensity::Normal,

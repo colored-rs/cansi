@@ -7,9 +7,11 @@
 See the [rs docs.](https://docs.rs/cansi/)
 Look at progress and contribute on [github.](https://github.com/kurtlawrence/cansi)
 
-`cansi` will parse text with ANSI escape sequences in it and return a deconstructed text with metadata around the colouring and styling. `cansi` is only concerned with `CSI` sequences, particuarly the `SGR` parameters. `cansi` will not constructed escaped text, there are crates such as [colored](https://crates.io/crates/colored) that do a great job of colouring and styling text.
+`cansi` will parse text with ANSI escape sequences in it and return a deconstructed text with metadata around the colouring and styling. `cansi` is only concerned with `CSI` sequences, particuarly the `SGR` parameters. `cansi` will not construct escaped text, there are crates such as [`colored`](https://crates.io/crates/colored) that do a great job of colouring and styling text.
 
 ## Example usage
+
+> This example was done using the `colored` crate to help with constructing the escaped text string. It will work with other tools that inject escape sequences into text strings (given they follow [ANSI specification](https://en.wikipedia.org/wiki/ANSI_escape_code)).
 
 ```rust
 extern crate cansi;
@@ -32,24 +34,18 @@ write!(
 )
 .unwrap();
 
-let result = categorise_text(&v); // cansi function
+let text = String::from_utf8_lossy(&v);
+let result = categorise_text(&text); // cansi function
 
 assert_eq!(result.len(), 7); // there should be seven differently styled components
 
-assert_eq!(
-    b"Hello, world!",
-    &result
-      .iter()
-      .flat_map(|r| r.text)
-      .map(|x| *x)
-      .collect::<Vec<_>>()[..]
-  );
+assert_eq!("Hello, world!", &construct_text_no_codes(&result));
 
 // 'Hello, ' is just defaults
 assert_eq!(
   result[0],
   CategorisedSlice {
-    text: b"Hello, ",
+    text_as_bytes: b"Hello, ",
     fg_colour: Color::White,
     bg_colour: Color::Black,
     intensity: Intensity::Normal,
@@ -66,7 +62,7 @@ assert_eq!(
 assert_eq!(
   result[1],
   CategorisedSlice {
-    text: b"w",
+    text_as_bytes: b"w",
     fg_colour: Color::White,
     bg_colour: Color::Red,
     intensity: Intensity::Normal,
@@ -79,7 +75,3 @@ assert_eq!(
   }
 );
 ```
-
-> **Note**
->
-> The example was done using the `colored` crate to help with constructing the escaped text string. It will work with other tools that inject escape sequences into text strings.
