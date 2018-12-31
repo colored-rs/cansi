@@ -4,6 +4,11 @@ description = "Catergorise ANSI - ANSI escape code parser and categoriser"
 version = "0.1.0"
 authors = ["kurt <kurtlawrence92@gmail.com>"]
 license = "MIT"
+homepage = "https://github.com/kurtlawrence/cansi"
+repository = "https://github.com/kurtlawrence/cansi"
+documentation = "https://docs.rs/cansi/"
+readme = "README.md"
+keywords = [ "ansi", "parsing", "escape code" ]
 edition = "2018"
 
 [dependencies]
