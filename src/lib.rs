@@ -75,6 +75,9 @@
 //!   }
 //! );
 //! ```
+
+#![warn(missing_docs)]
+
 extern crate colored;
 extern crate parse_ansi;
 
@@ -242,7 +245,9 @@ pub struct CategorisedSlice<'text> {
 	pub bg_colour: Color,
 	/// The emphasis state (bold, faint, normal).
 	pub intensity: Intensity,
+	/// Italicised.
 	pub italic: bool,
+	/// Underlined.
 	pub underline: bool,
 	/// Slow blink text.
 	pub blink: bool,
@@ -250,6 +255,7 @@ pub struct CategorisedSlice<'text> {
 	pub reversed: bool,
 	/// Invisible text.
 	pub hidden: bool,
+	/// Struck-through.
 	pub strikethrough: bool,
 }
 
@@ -270,8 +276,11 @@ struct SGR {
 /// The emphasis (bold, faint) states.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Intensity {
+	/// Normal intensity (no emphasis).
 	Normal,
+	/// Bold.
 	Bold,
+	/// Faint.
 	Faint,
 }
 
