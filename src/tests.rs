@@ -185,3 +185,47 @@ fn cover_other_parameters() {
 		}
 	);
 }
+
+
+#[test]
+fn split_on_new_line_tests() {
+
+	// no remainder
+	let (first, remainder) = split_on_new_line(b"Hello worlds");
+	assert_eq!(first, b"Hello worlds");
+	assert_eq!(remainder, None);
+
+	let (first, remainder) = split_on_new_line(b"Hello worlds\n");
+	assert_eq!(first, b"Hello worlds");
+	assert_eq!(remainder, None);
+
+	let (first, remainder) = split_on_new_line(b"Hello worlds\r\n");
+	assert_eq!(first, b"Hello worlds");
+	assert_eq!(remainder, None);
+
+	// some remainder
+	let (first, remainder) = split_on_new_line(b"Hello worlds\none two three");
+	assert_eq!(first, b"Hello worlds");
+	assert_eq!(remainder, Some(&b"one two three"[..]));
+
+	let (first, remainder) = split_on_new_line(b"Hello worlds\r\none two three");
+	assert_eq!(first, b"Hello worlds");
+	assert_eq!(remainder, Some(&b"one two three"[..]));
+
+	let (first, remainder) = split_on_new_line(b"Hello worlds\r\none\ntwo\nthree\n");
+	assert_eq!(first, b"Hello worlds");
+	assert_eq!(remainder, Some(&b"one\ntwo\nthree\n"[..]));
+
+	// no first
+	let (first, remainder) = split_on_new_line(b"\r\nHello worlds\none two three");
+	assert_eq!(first, b"");
+	assert_eq!(remainder, Some(&b"Hello worlds\none two three"[..]));
+
+	let (first, remainder) = split_on_new_line(b"\nHello worlds\r\none two three");
+	assert_eq!(first, b"");
+	assert_eq!(remainder, Some(&b"Hello worlds\r\none two three"[..]));
+
+	let (first, remainder) = split_on_new_line(b"\r\n");
+	assert_eq!(first, b"");
+	assert_eq!(remainder, None);
+}
