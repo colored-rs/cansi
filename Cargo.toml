@@ -1,7 +1,7 @@
 [package]
 name = "cansi"
 description = "Catergorise ANSI - ANSI escape code parser and categoriser"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["kurt <kurtlawrence92@gmail.com>"]
 license = "MIT"
 homepage = "https://github.com/kurtlawrence/cansi"
@@ -13,4 +13,4 @@ edition = "2018"
 
 [dependencies]
 parse-ansi = "0.1.6"
-colored = "1.6.1"
+colored = "1.7.0"
