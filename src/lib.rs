@@ -1,29 +1,29 @@
 //! # cansi
-//! 
+//!
 //! [![Build Status](https://travis-ci.com/kurtlawrence/cansi.svg?branch=master)](https://travis-ci.com/kurtlawrence/cansi)
 //! [![Latest Version](https://img.shields.io/crates/v/cansi.svg)](https://crates.io/crates/cansi)
 //! [![Rust Documentation](https://img.shields.io/badge/api-rustdoc-blue.svg)](https://docs.rs/cansi)
 //! [![codecov](https://codecov.io/gh/kurtlawrence/cansi/branch/master/graph/badge.svg)](https://codecov.io/gh/kurtlawrence/cansi)
-//! 
+//!
 //! ## **C**atergorise **ANSI** - ANSI escape code parser and categoriser
-//! 
+//!
 //! See the [rs docs.](https://docs.rs/cansi/)
 //! Look at progress and contribute on [github.](https://github.com/kurtlawrence/cansi)
-//! 
+//!
 //! `cansi` will parse text with ANSI escape sequences in it and return a deconstructed text with metadata around the colouring and styling. `cansi` is only concerned with `CSI` sequences, particuarly the `SGR` parameters. `cansi` will not construct escaped text, there are crates such as [`colored`](https://crates.io/crates/colored) that do a great job of colouring and styling text.
-//! 
+//!
 //! ## Example usage
-//! 
+//!
 //! > This example was done using the `colored` crate to help with constructing the escaped text string. It will work with other tools that inject escape sequences into text strings (given they follow [ANSI specification](https://en.wikipedia.org/wiki/ANSI_escape_code)).
-//! 
+//!
 //! ```rust
 //! extern crate cansi;
 //! extern crate colored;
-//! 
+//!
 //! use cansi::*;
 //! use colored::*;
 //! use std::io::Write;
-//! 
+//!
 //! let v = &mut Vec::new();
 //! write!(
 //!   v,
@@ -36,14 +36,14 @@
 //!   "!".bright_red().on_bright_yellow(),
 //! )
 //! .unwrap();
-//! 
+//!
 //! let text = String::from_utf8_lossy(&v);
 //! let result = categorise_text(&text); // cansi function
-//! 
+//!
 //! assert_eq!(result.len(), 7); // there should be seven differently styled components
-//! 
+//!
 //! assert_eq!("Hello, world!", &construct_text_no_codes(&result));
-//! 
+//!
 //! // 'Hello, ' is just defaults
 //! assert_eq!(
 //!   result[0],
@@ -60,7 +60,7 @@
 //!     strikethrough: false
 //!   }
 //! );
-//! 
+//!
 //! // 'w' is coloured differently
 //! assert_eq!(
 //!   result[1],
@@ -335,7 +335,10 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 
             if let Some(remainder) = remainder {
                 // there is a remainder, which means that a new line was hit
-                self.prev = Some(slice.clone_style(remainder));
+                if remainder.len() > 0 {
+                    // not just a trailing new line.
+                    self.prev = Some(slice.clone_style(remainder));
+                }
                 break; // exit looping
             }
         }
@@ -350,7 +353,7 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 
 /// Splits on the first instance of `\r\n` or `\n` bytes.
 /// Returns the first split slice, and the remainder slice if there is a split and items afterwards.
-/// Will not return an empty remainder slice. Can return empty first slice (say `"\nHello"`);
+/// Can return an empty remainder slice (if terminated with a new line). Can return empty first slice (say `"\nHello"`);
 fn split_on_new_line(txt_slice: &[u8]) -> (&[u8], Option<&[u8]>) {
     let mut split = txt_slice.splitn(2, |byte| byte == &b'\n'); // split on new line byte
 
@@ -367,13 +370,7 @@ fn split_on_new_line(txt_slice: &[u8]) -> (&[u8], Option<&[u8]>) {
     };
 
     match split.next() {
-        Some(r) => {
-            if r.len() > 0 {
-                (first, Some(r))
-            } else {
-                (first, None)
-            }
-        }
+        Some(r) => (first, Some(r)),
         None => (first, None),
     }
 }

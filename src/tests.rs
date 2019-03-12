@@ -1,4 +1,5 @@
 use super::*;
+use colored::*;
 
 #[test]
 fn cover_other_parameters() {
@@ -195,11 +196,11 @@ fn split_on_new_line_tests() {
 
     let (first, remainder) = split_on_new_line(b"Hello worlds\n");
     assert_eq!(first, b"Hello worlds");
-    assert_eq!(remainder, None);
+    assert_eq!(remainder, Some(&[][..]));
 
     let (first, remainder) = split_on_new_line(b"Hello worlds\r\n");
     assert_eq!(first, b"Hello worlds");
-    assert_eq!(remainder, None);
+    assert_eq!(remainder, Some(&[][..]));
 
     // some remainder
     let (first, remainder) = split_on_new_line(b"Hello worlds\none two three");
@@ -225,7 +226,7 @@ fn split_on_new_line_tests() {
 
     let (first, remainder) = split_on_new_line(b"\r\n");
     assert_eq!(first, b"");
-    assert_eq!(remainder, None);
+    assert_eq!(remainder, Some(&[][..]));
 }
 
 #[test]
@@ -244,8 +245,6 @@ fn clone_style_test() {
 
 #[test]
 fn line_iter_test() {
-    use colored::*;
-
     let mut green = CategorisedSlice::default_style(b"");
     let mut red = CategorisedSlice::default_style(b"");
     green.fg_colour = Color::Green;
@@ -329,6 +328,10 @@ fn line_iter_test() {
         iter.next(),
         Some(vec![CategorisedSlice::default_style(b"")])
     );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style(b"")])
+    );
     assert_eq!(iter.next(), None);
 
     let cat = categorise_text("\r\n\r\n\r\n\r\n");
@@ -349,5 +352,51 @@ fn line_iter_test() {
         iter.next(),
         Some(vec![CategorisedSlice::default_style(b"")])
     );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style(b"")])
+    );
     assert_eq!(iter.next(), None);
+}
+
+#[test]
+fn line_iter_newline_starts_with_esc() {
+    let mut green = CategorisedSlice::default_style(b"");
+    green.fg_colour = Color::Green;
+
+    let s = format!("hello\n{}", "world".green());
+    let cat = categorise_text(&s);
+    let mut iter = line_iter(&cat);
+
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style(b"hello")])
+    );
+    assert_eq!(iter.next(), Some(vec![green.clone_style(b"world")]));
+}
+
+#[test]
+fn line_iter_bugs() {
+    let bug_str = "\u{1b}[36mpapyrus\u{1b}[0m=> 5+6\n\u{1b}[36mpapyrus\u{1b}[0m \u{1b}[92m[out0]\u{1b}[0m: 11                                            \n\u{1b}[36mpapyrus\u{1b}[0m=>
+                              \n                                                                                \n                                                                                \n
+                     \n                                                                                \n                                                                                \n
+            \n                                                                                \n                                                                                \n
+   \n                                                                                \n                                                                                \n                                                                                \n
+                                                                            \n                                                                                \n                                                                                \n
+                                                                   \n                                                                                \n                                                                                \n
+                                                          \n                                                                                \n                                                                                \n";
+
+    let cat = categorise_text(bug_str);
+    let mut iter = line_iter(&cat);
+
+    let mut cyan = CategorisedSlice::default_style(b"");
+    cyan.fg_colour = Color::Cyan;
+
+    assert_eq!(
+        iter.next(),
+        Some(vec![
+            cyan.clone_style(b"papyrus"),
+            CategorisedSlice::default_style(b"=> 5+6")
+        ])
+    );
 }
