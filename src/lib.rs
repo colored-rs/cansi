@@ -252,9 +252,22 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
     type Item = CategorisedLine<'text>;
     fn next(&mut self) -> Option<Self::Item> {
         let mut v = Vec::new();
+
         if let Some(prev) = &self.prev {
-            v.push(prev.clone_style(prev.text_as_bytes));
-            self.prev = None;
+            // need to test splitting this, might be more new lines in remainder
+            let (first, remainder) = split_on_new_line(prev.text_as_bytes);
+
+            // push first slice on -- only if not empty
+            // if first.len() == 0 it is because there is a sequence of new lines
+            v.push(prev.clone_style(first));
+
+            if let Some(remainder) = remainder {
+                // there is a remainder, which means that a new line was hit
+                self.prev = Some(prev.clone_style(remainder));
+                return Some(v); // exit early
+            }
+
+            self.prev = None; // consumed prev
         }
 
         while let Some(slice) = self.slices.get(self.idx) {
@@ -262,8 +275,10 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 
             let (first, remainder) = split_on_new_line(slice.text_as_bytes);
 
-            // push first slice on
-            v.push(slice.clone_style(first));
+            // push first slice on -- only if not empty
+            if first.len() > 0 || v.len() == 0 {
+                v.push(slice.clone_style(first));
+            }
 
             if let Some(remainder) = remainder {
                 // there is a remainder, which means that a new line was hit
@@ -272,8 +287,8 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
             }
         }
 
-        if v.len() == 0 {
-            None
+        if v.len() == 0 && self.idx >= self.slices.len() {
+            None // stop iterating if no slices were met and the index is above the slices len
         } else {
             Some(v)
         }
@@ -343,6 +358,23 @@ impl<'text> CategorisedSlice<'text> {
         let mut c = self.clone();
         c.text_as_bytes = txt_slice;
         c
+    }
+
+    #[cfg(test)]
+    fn default_style(txt_slice: &'text [u8]) -> Self {
+        let sgr = SGR::default();
+        CategorisedSlice {
+            text_as_bytes: txt_slice,
+            fg_colour: sgr.fg_colour,
+            bg_colour: sgr.bg_colour,
+            intensity: sgr.intensity.clone(),
+            italic: sgr.italic,
+            underline: sgr.underline,
+            blink: sgr.blink,
+            reversed: sgr.reversed,
+            hidden: sgr.hidden,
+            strikethrough: sgr.strikethrough,
+        }
     }
 }
 
