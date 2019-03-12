@@ -331,7 +331,7 @@ fn line_iter_test() {
     );
     assert_eq!(iter.next(), None);
 
-	let cat = categorise_text("\r\n\r\n\r\n\r\n");
+    let cat = categorise_text("\r\n\r\n\r\n\r\n");
     let mut iter = line_iter(&cat);
     assert_eq!(
         iter.next(),

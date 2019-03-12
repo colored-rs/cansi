@@ -231,6 +231,29 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
     slices
 }
 
+/// Construct an iterator over each new line (`\n` or `\r\n`) and returns the categorised slices within those.
+/// `CategorisedSlice`s that include a new line are split with the same style.
+///
+/// # Example
+/// ```rust
+/// use colored::*;
+/// use cansi::*;
+///
+/// let s = format!("{}{}\nhow are you\r\ntoday", "hello, ".green(), "world".red());
+/// let cat = categorise_text(&s);
+/// let mut iter = line_iter(&cat);
+///
+/// let first = iter.next().unwrap();
+/// assert_eq!(first[0].text_as_bytes, b"hello, ");
+/// assert_eq!(first[0].fg_colour, Color::Green);
+///
+/// assert_eq!(first[1].text_as_bytes, b"world");
+/// assert_eq!(first[1].fg_colour, Color::Red);
+///
+/// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "how are you");
+/// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "today");
+/// assert_eq!(iter.next(), None);
+/// ```
 pub fn line_iter<'text, 'iter>(
     categorised_slices: &'iter CategorisedSlices<'text>,
 ) -> CategorisedLineIterator<'text, 'iter> {
@@ -241,11 +264,38 @@ pub fn line_iter<'text, 'iter>(
     }
 }
 
+/// An iterator structure for `CategorisedSlices`, iterating over each new line (`\n` or `\r\n`) and returns the categorised slices within those.
+/// `CategorisedSlice`s that include a new line are split with the same style.
+///
+/// # Example
+/// ```rust
+/// use colored::*;
+/// use cansi::*;
+///
+/// let s = format!("{}{}\nhow are you\r\ntoday", "hello, ".green(), "world".red());
+/// let cat = categorise_text(&s);
+/// let mut iter = line_iter(&cat);
+///
+/// let first = iter.next().unwrap();
+/// assert_eq!(first[0].text_as_bytes, b"hello, ");
+/// assert_eq!(first[0].fg_colour, Color::Green);
+///
+/// assert_eq!(first[1].text_as_bytes, b"world");
+/// assert_eq!(first[1].fg_colour, Color::Red);
+///
+/// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "how are you");
+/// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "today");
+/// assert_eq!(iter.next(), None);
+/// ```
 pub struct CategorisedLineIterator<'text, 'iter> {
     slices: &'iter CategorisedSlices<'text>,
     idx: usize,
     prev: Option<CategorisedSlice<'text>>,
 }
+/// The item type of `CategorisedLineIterator`.
+///
+/// # Note
+/// > The type alias is the same as `CategorisedSlices`, so functions such as `construct_text_no_codes` will work.
 pub type CategorisedLine<'text> = Vec<CategorisedSlice<'text>>;
 
 impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
