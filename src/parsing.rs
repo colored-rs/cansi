@@ -1,4 +1,3 @@
-use super::*;
 use regex::{Matches, Regex};
 
 lazy_static! {
@@ -29,7 +28,6 @@ pub fn parse(text: &str) -> Matches {
 }
 
 const ANSI_RE: &str = r"[\x1b\x9b]\[[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]";
-// const ANSI_RE: &str = r"[\x1b\x9b]\[[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]";
 
 #[cfg(test)]
 mod tests {

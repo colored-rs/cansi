@@ -128,18 +128,8 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
         // add in the text before CSI with the previous SGR format
         let hi = m.start();
         if hi != lo {
-            slices.push(CategorisedSlice {
-                text: &text[lo..hi],
-                fg_colour: sgr.fg_colour,
-                bg_colour: sgr.bg_colour,
-                intensity: sgr.intensity.clone(),
-                italic: sgr.italic,
-                underline: sgr.underline,
-                blink: sgr.blink,
-                reversed: sgr.reversed,
-                hidden: sgr.hidden,
-                strikethrough: sgr.strikethrough,
-            });
+			slices.push(CategorisedSlice::with_sgr(sgr, &text[lo..hi]));
+         
         }
 
         lo = m.end();
@@ -217,18 +207,7 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
     }
 
     if lo != text.len() {
-        slices.push(CategorisedSlice {
-            text: &text[lo..text.len()],
-            fg_colour: sgr.fg_colour,
-            bg_colour: sgr.bg_colour,
-            intensity: sgr.intensity.clone(),
-            italic: sgr.italic,
-            underline: sgr.underline,
-            blink: sgr.blink,
-            reversed: sgr.reversed,
-            hidden: sgr.hidden,
-            strikethrough: sgr.strikethrough,
-        });
+		slices.push(CategorisedSlice::with_sgr(sgr, &text[lo..text.len()])); 
     }
 
     slices
@@ -378,7 +357,7 @@ fn split_on_new_line(txt: &str) -> (&str, Option<&str>) {
 }
 
 /// Data structure that holds information about colouring and styling of a text slice.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct CategorisedSlice<'text> {
     /// The text slice.
     pub text: &'text str,
@@ -403,32 +382,48 @@ pub struct CategorisedSlice<'text> {
 }
 
 impl<'text> CategorisedSlice<'text> {
-    fn clone_style(&self, txt: &'text str) -> Self {
-        let mut c = self.clone();
+    const fn with_sgr(sgr: SGR, txt: &'text str) -> Self {
+        let SGR {
+            fg_colour,
+            bg_colour,
+            intensity,
+            italic,
+            underline,
+            blink,
+            reversed,
+            hidden,
+            strikethrough,
+        } = sgr;
+
+        Self {
+            text: txt,
+            fg_colour: fg_colour,
+            bg_colour: bg_colour,
+            intensity: intensity,
+            italic: italic,
+            underline: underline,
+            blink: blink,
+            reversed: reversed,
+            hidden: hidden,
+            strikethrough: strikethrough,
+        }
+    }
+
+    const fn clone_style(&self, txt: &'text str) -> Self {
+        let mut c = *self;
         c.text = txt;
         c
     }
 
     #[cfg(test)]
-    fn default_style(txt: &'text str) -> Self {
-        let sgr = SGR::default();
-        CategorisedSlice {
-            text: txt,
-            fg_colour: sgr.fg_colour,
-            bg_colour: sgr.bg_colour,
-            intensity: sgr.intensity.clone(),
-            italic: sgr.italic,
-            underline: sgr.underline,
-            blink: sgr.blink,
-            reversed: sgr.reversed,
-            hidden: sgr.hidden,
-            strikethrough: sgr.strikethrough,
-        }
+    const fn default_style(txt: &'text str) -> Self {
+        Self::with_sgr(SGR::default(), txt)
     }
 }
 
 /// The formatting components `SGR (Select Graphic Rendition)`.
 /// [spec](https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters)
+#[derive(Clone, Copy)]
 struct SGR {
     fg_colour: Color,
     bg_colour: Color,
@@ -442,7 +437,7 @@ struct SGR {
 }
 
 /// The emphasis (bold, faint) states.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Intensity {
     /// Normal intensity (no emphasis).
     Normal,
@@ -474,8 +469,8 @@ pub enum Color {
     BrightWhite,
 }
 
-impl Default for SGR {
-    fn default() -> Self {
+impl SGR {
+    const fn default() -> Self {
         SGR {
             fg_colour: Color::White,
             bg_colour: Color::Black,
