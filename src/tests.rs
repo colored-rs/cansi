@@ -1,5 +1,5 @@
 use super::*;
-use colored::*;
+use colored::Colorize;
 
 #[test]
 fn cover_other_parameters() {

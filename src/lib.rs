@@ -21,7 +21,7 @@
 //! extern crate colored;
 //!
 //! use cansi::*;
-//! use colored::*;
+//! use colored::Colorize;
 //! use std::io::Write;
 //!
 //! let v = &mut Vec::new();
@@ -81,14 +81,10 @@
 
 #![warn(missing_docs)]
 
-extern crate colored;
 extern crate parse_ansi;
 
 #[cfg(test)]
 mod tests;
-
-/// Re-export of [colored::Color](https://docs.rs/colored/1.6.1/colored/enum.Color.html).
-pub use self::colored::Color;
 
 const SEPARATOR: u8 = b';';
 
@@ -239,7 +235,7 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
 ///
 /// # Example
 /// ```rust
-/// use colored::*;
+/// use colored::Colorize;
 /// use cansi::*;
 ///
 /// let s = format!("{}{}\nhow are you\r\ntoday", "hello, ".green(), "world".red());
@@ -272,7 +268,7 @@ pub fn line_iter<'text, 'iter>(
 ///
 /// # Example
 /// ```rust
-/// use colored::*;
+/// use colored::Colorize;
 /// use cansi::*;
 ///
 /// let s = format!("{}{}\nhow are you\r\ntoday", "hello, ".green(), "world".red());
@@ -451,6 +447,28 @@ pub enum Intensity {
     Bold,
     /// Faint.
     Faint,
+}
+
+/// The 8 standard colors.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[allow(missing_docs)]
+pub enum Color {
+    Black,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan,
+    White,
+    BrightBlack,
+    BrightRed,
+    BrightGreen,
+    BrightYellow,
+    BrightBlue,
+    BrightMagenta,
+    BrightCyan,
+    BrightWhite,
 }
 
 impl Default for SGR {

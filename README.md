@@ -21,7 +21,7 @@ extern crate cansi;
 extern crate colored;
 
 use cansi::*;
-use colored::*;
+use colored::Colorize;
 use std::io::Write;
 
 let v = &mut Vec::new();
