@@ -48,7 +48,7 @@
 //! assert_eq!(
 //!   result[0],
 //!   CategorisedSlice {
-//!     text_as_bytes: b"Hello, ",
+//!     text: "Hello, ",
 //!     fg_colour: Color::White,
 //!     bg_colour: Color::Black,
 //!     intensity: Intensity::Normal,
@@ -65,7 +65,7 @@
 //! assert_eq!(
 //!   result[1],
 //!   CategorisedSlice {
-//!     text_as_bytes: b"w",
+//!     text: "w",
 //!     fg_colour: Color::White,
 //!     bg_colour: Color::Red,
 //!     intensity: Intensity::Normal,
@@ -81,10 +81,15 @@
 
 #![warn(missing_docs)]
 
-extern crate parse_ansi;
+#[macro_use]
+extern crate lazy_static;
+
+mod parsing;
 
 #[cfg(test)]
 mod tests;
+
+pub use parsing::{parse, ANSI_RGX};
 
 const SEPARATOR: u8 = b';';
 
@@ -103,7 +108,7 @@ pub fn construct_text_no_codes(categorised_slices: &CategorisedSlices) -> String
     String::from_utf8_lossy(
         &categorised_slices
             .iter()
-            .flat_map(|r| r.text_as_bytes)
+            .flat_map(|r| r.text.as_bytes())
             .map(|x| *x)
             .collect::<Vec<_>>()[..],
     )
@@ -119,13 +124,12 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
     let mut sgr = SGR::default();
     let mut lo = 0;
     let mut slices: Vec<CategorisedSlice> = Vec::new();
-    let text = text.as_bytes();
-    for m in parse_ansi::parse_bytes(text) {
+    for m in parse(text) {
         // add in the text before CSI with the previous SGR format
         let hi = m.start();
         if hi != lo {
             slices.push(CategorisedSlice {
-                text_as_bytes: &text[lo..hi],
+                text: &text[lo..hi],
                 fg_colour: sgr.fg_colour,
                 bg_colour: sgr.bg_colour,
                 intensity: sgr.intensity.clone(),
@@ -139,7 +143,7 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
         }
 
         lo = m.end();
-        let mut escape_seq = m.as_bytes().iter().skip(2); // skip the first two (would be ESC *)
+        let mut escape_seq = m.as_str().as_bytes().iter().skip(2); // skip the first two (would be ESC *)
         sgr = SGR::default();
         let mut seq = Vec::new();
         // spec at https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences
@@ -214,7 +218,7 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
 
     if lo != text.len() {
         slices.push(CategorisedSlice {
-            text_as_bytes: &text[lo..text.len()],
+            text: &text[lo..text.len()],
             fg_colour: sgr.fg_colour,
             bg_colour: sgr.bg_colour,
             intensity: sgr.intensity.clone(),
@@ -243,10 +247,10 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
 /// let mut iter = line_iter(&cat);
 ///
 /// let first = iter.next().unwrap();
-/// assert_eq!(first[0].text_as_bytes, b"hello, ");
+/// assert_eq!(first[0].text, "hello, ");
 /// assert_eq!(first[0].fg_colour, Color::Green);
 ///
-/// assert_eq!(first[1].text_as_bytes, b"world");
+/// assert_eq!(first[1].text, "world");
 /// assert_eq!(first[1].fg_colour, Color::Red);
 ///
 /// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "how are you");
@@ -276,10 +280,10 @@ pub fn line_iter<'text, 'iter>(
 /// let mut iter = line_iter(&cat);
 ///
 /// let first = iter.next().unwrap();
-/// assert_eq!(first[0].text_as_bytes, b"hello, ");
+/// assert_eq!(first[0].text, "hello, ");
 /// assert_eq!(first[0].fg_colour, Color::Green);
 ///
-/// assert_eq!(first[1].text_as_bytes, b"world");
+/// assert_eq!(first[1].text, "world");
 /// assert_eq!(first[1].fg_colour, Color::Red);
 ///
 /// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "how are you");
@@ -304,7 +308,7 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 
         if let Some(prev) = &self.prev {
             // need to test splitting this, might be more new lines in remainder
-            let (first, remainder) = split_on_new_line(prev.text_as_bytes);
+            let (first, remainder) = split_on_new_line(prev.text);
 
             // push first slice on -- only if not empty
             // if first.len() == 0 it is because there is a sequence of new lines
@@ -322,7 +326,7 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
         while let Some(slice) = self.slices.get(self.idx) {
             self.idx += 1; // increment to next slice, always happens as well split this slice.
 
-            let (first, remainder) = split_on_new_line(slice.text_as_bytes);
+            let (first, remainder) = split_on_new_line(slice.text);
 
             // push first slice on -- only if not empty
             if first.len() > 0 || v.len() == 0 {
@@ -350,20 +354,22 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 /// Splits on the first instance of `\r\n` or `\n` bytes.
 /// Returns the first split slice, and the remainder slice if there is a split and items afterwards.
 /// Can return an empty remainder slice (if terminated with a new line). Can return empty first slice (say `"\nHello"`);
-fn split_on_new_line(txt_slice: &[u8]) -> (&[u8], Option<&[u8]>) {
-    let mut split = txt_slice.splitn(2, |byte| byte == &b'\n'); // split on new line byte
+fn split_on_new_line(txt: &str) -> (&str, Option<&str>) {
+    let mut split = txt.splitn(2, |ch| ch == '\n'); // split on new line byte
 
     let first = split.next().expect("should be one I guess?"); // get the first return
 
-    let first = if let Some(last) = first.last() {
-        if last == &b'\r' {
-            first.split_last().expect("there are elements").1
-        } else {
-            first
-        }
-    } else {
-        first
-    };
+    // let first = if let Some(last) = first.last() {
+    //     if last == &'\r' {
+    //         first.split_last().expect("there are elements").1
+    //     } else {
+    //         first
+    //     }
+    // } else {
+    //     first
+    // };
+
+    let first = first.trim_matches('\r');
 
     match split.next() {
         Some(r) => (first, Some(r)),
@@ -374,11 +380,8 @@ fn split_on_new_line(txt_slice: &[u8]) -> (&[u8], Option<&[u8]>) {
 /// Data structure that holds information about colouring and styling of a text slice.
 #[derive(Debug, PartialEq, Clone)]
 pub struct CategorisedSlice<'text> {
-    /// The text slice as a byte array.
-    ///
-    /// # Note
-    /// Once the crate [`parse-ansi`](https://crates.io/crates/parse-ansi) moves to [`regex`](https://crates.io/crates/regex) crate `1.1.0` it will be possible to return a string slice (`&str`).
-    pub text_as_bytes: &'text [u8],
+    /// The text slice.
+    pub text: &'text str,
     /// The foreground (or text) colour.
     pub fg_colour: Color,
     /// The background colour.
@@ -400,17 +403,17 @@ pub struct CategorisedSlice<'text> {
 }
 
 impl<'text> CategorisedSlice<'text> {
-    fn clone_style(&self, txt_slice: &'text [u8]) -> Self {
+    fn clone_style(&self, txt: &'text str) -> Self {
         let mut c = self.clone();
-        c.text_as_bytes = txt_slice;
+        c.text = txt;
         c
     }
 
     #[cfg(test)]
-    fn default_style(txt_slice: &'text [u8]) -> Self {
+    fn default_style(txt: &'text str) -> Self {
         let sgr = SGR::default();
         CategorisedSlice {
-            text_as_bytes: txt_slice,
+            text: txt,
             fg_colour: sgr.fg_colour,
             bg_colour: sgr.bg_colour,
             intensity: sgr.intensity.clone(),

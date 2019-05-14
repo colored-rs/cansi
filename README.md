@@ -48,7 +48,7 @@ assert_eq!("Hello, world!", &construct_text_no_codes(&result));
 assert_eq!(
   result[0],
   CategorisedSlice {
-    text_as_bytes: b"Hello, ",
+    text: "Hello, ",
     fg_colour: Color::White,
     bg_colour: Color::Black,
     intensity: Intensity::Normal,
@@ -65,7 +65,7 @@ assert_eq!(
 assert_eq!(
   result[1],
   CategorisedSlice {
-    text_as_bytes: b"w",
+    text: "w",
     fg_colour: Color::White,
     bg_colour: Color::Red,
     intensity: Intensity::Normal,
