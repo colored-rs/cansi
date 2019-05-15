@@ -233,26 +233,13 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 /// Returns the first split slice, and the remainder slice if there is a split and items afterwards.
 /// Can return an empty remainder slice (if terminated with a new line). Can return empty first slice (say `"\nHello"`);
 fn split_on_new_line(txt: &str) -> (&str, Option<&str>) {
-    let mut split = txt.splitn(2, |ch| ch == '\n'); // split on new line byte
+    let mut split = txt.splitn(2, '\n'); // split on new line byte
 
     let first = split.next().expect("should be one I guess?"); // get the first return
 
-    // let first = if let Some(last) = first.last() {
-    //     if last == &'\r' {
-    //         first.split_last().expect("there are elements").1
-    //     } else {
-    //         first
-    //     }
-    // } else {
-    //     first
-    // };
-
     let first = first.trim_matches('\r');
 
-    match split.next() {
-        Some(r) => (first, Some(r)),
-        None => (first, None),
-    }
+    (first, split.next())
 }
 
 /// Data structure that holds information about colouring and styling of a text slice.
