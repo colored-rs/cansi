@@ -1,11 +1,11 @@
 /// A match.
 pub struct Match<'t> {
-	/// First byte index.
+    /// First byte index.
     pub start: usize,
-	/// Last byte index + 1.
+    /// Last byte index + 1.
     pub end: usize,
-	/// The text slice (ie `text[start..end]`).
-	/// Note that the range is `(start..end]`.
+    /// The text slice (ie `text[start..end]`).
+    /// Note that the range is `(start..end]`.
     pub text: &'t str,
 }
 
