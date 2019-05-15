@@ -102,14 +102,18 @@ pub type CategorisedSlices<'text> = Vec<CategorisedSlice<'text>>;
 /// assert_eq!("Hello", &construct_text_no_codes(&categorised));
 /// ```
 pub fn construct_text_no_codes(categorised_slices: &CategorisedSlices) -> String {
-    String::from_utf8_lossy(
-        &categorised_slices
+    let slices = categorised_slices;
+    let mut s = String::with_capacity(
+        categorised_slices
             .iter()
-            .flat_map(|r| r.text.as_bytes())
-            .map(|x| *x)
-            .collect::<Vec<_>>()[..],
-    )
-    .into_owned()
+            .map(|x| x.text.len())
+            .sum::<usize>(),
+    );
+    for sl in slices {
+        s.push_str(sl.text);
+    }
+
+    s
 }
 
 /// Construct an iterator over each new line (`\n` or `\r\n`) and returns the categorised slices within those.
