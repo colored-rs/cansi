@@ -81,15 +81,13 @@
 
 #![warn(missing_docs)]
 
-#[macro_use]
-extern crate lazy_static;
-
 mod parsing;
 
 #[cfg(test)]
 mod tests;
 
-pub use parsing::{parse, ANSI_RGX};
+// pub use parsing::{parse, ANSI_RGX};
+pub use parsing::parse;
 
 const SEPARATOR: u8 = b';';
 
@@ -126,14 +124,13 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
     let mut slices: Vec<CategorisedSlice> = Vec::new();
     for m in parse(text) {
         // add in the text before CSI with the previous SGR format
-        let hi = m.start();
+        let hi = m.start;
         if hi != lo {
-			slices.push(CategorisedSlice::with_sgr(sgr, &text[lo..hi]));
-         
+            slices.push(CategorisedSlice::with_sgr(sgr, &text[lo..hi]));
         }
 
-        lo = m.end();
-        let mut escape_seq = m.as_str().as_bytes().iter().skip(2); // skip the first two (would be ESC *)
+        lo = m.end;
+        let mut escape_seq = m.text.as_bytes().iter().skip(2); // skip the first two (would be ESC *)
         sgr = SGR::default();
         let mut seq = Vec::new();
         // spec at https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences
@@ -207,7 +204,7 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
     }
 
     if lo != text.len() {
-		slices.push(CategorisedSlice::with_sgr(sgr, &text[lo..text.len()])); 
+        slices.push(CategorisedSlice::with_sgr(sgr, &text[lo..text.len()]));
     }
 
     slices
