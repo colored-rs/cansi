@@ -43,6 +43,8 @@ fn test_readme_code() {
         result[0],
         CategorisedSlice {
             text: "Hello, ",
+            start: 0,
+            end: 7,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -59,6 +61,8 @@ fn test_readme_code() {
         result[1],
         CategorisedSlice {
             text: "w",
+            start: 15,
+            end: 16,
             fg_colour: Color::White,
             bg_colour: Color::Red,
             intensity: Intensity::Normal,
@@ -75,6 +79,8 @@ fn test_readme_code() {
         result[2],
         CategorisedSlice {
             text: "o",
+            start: 28,
+            end: 29,
             fg_colour: Color::Cyan,
             bg_colour: Color::Green,
             intensity: Intensity::Normal,
@@ -91,6 +97,8 @@ fn test_readme_code() {
         result[3],
         CategorisedSlice {
             text: "r",
+            start: 41,
+            end: 42,
             fg_colour: Color::Magenta,
             bg_colour: Color::Yellow,
             intensity: Intensity::Normal,
@@ -107,6 +115,8 @@ fn test_readme_code() {
         result[4],
         CategorisedSlice {
             text: "l",
+            start: 54,
+            end: 55,
             fg_colour: Color::Blue,
             bg_colour: Color::White,
             intensity: Intensity::Normal,
@@ -123,6 +133,8 @@ fn test_readme_code() {
         result[5],
         CategorisedSlice {
             text: "d",
+            start: 68,
+            end: 69,
             fg_colour: Color::Yellow,
             bg_colour: Color::BrightCyan,
             intensity: Intensity::Normal,
@@ -139,6 +151,8 @@ fn test_readme_code() {
         result[6],
         CategorisedSlice {
             text: "!",
+            start: 82,
+            end: 83,
             fg_colour: Color::BrightRed,
             bg_colour: Color::BrightYellow,
             intensity: Intensity::Normal,
@@ -163,6 +177,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::Black,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -182,6 +198,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::Red,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -201,6 +219,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::Green,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -220,6 +240,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::Yellow,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -239,6 +261,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::Blue,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -258,6 +282,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::Magenta,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -277,6 +303,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::Magenta,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -296,6 +324,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::Cyan,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -315,6 +345,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -334,6 +366,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::BrightBlack,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -353,6 +387,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::BrightRed,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -372,6 +408,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::BrightGreen,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -391,6 +429,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::BrightYellow,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -410,6 +450,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::BrightBlue,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -429,6 +471,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::BrightMagenta,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -448,6 +492,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::BrightMagenta,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -467,6 +513,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::BrightCyan,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -486,6 +534,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::BrightWhite,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -505,6 +555,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -524,6 +576,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::Red,
             intensity: Intensity::Normal,
@@ -543,6 +597,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::Green,
             intensity: Intensity::Normal,
@@ -562,6 +618,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::Yellow,
             intensity: Intensity::Normal,
@@ -581,6 +639,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::Blue,
             intensity: Intensity::Normal,
@@ -600,6 +660,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::Magenta,
             intensity: Intensity::Normal,
@@ -619,6 +681,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::Magenta,
             intensity: Intensity::Normal,
@@ -638,6 +702,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::Cyan,
             intensity: Intensity::Normal,
@@ -657,6 +723,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 5,
+            end: 9,
             fg_colour: Color::White,
             bg_colour: Color::White,
             intensity: Intensity::Normal,
@@ -676,6 +744,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 6,
+            end: 10,
             fg_colour: Color::White,
             bg_colour: Color::BrightBlack,
             intensity: Intensity::Normal,
@@ -695,6 +765,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 6,
+            end: 10,
             fg_colour: Color::White,
             bg_colour: Color::BrightRed,
             intensity: Intensity::Normal,
@@ -714,6 +786,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 6,
+            end: 10,
             fg_colour: Color::White,
             bg_colour: Color::BrightGreen,
             intensity: Intensity::Normal,
@@ -733,6 +807,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 6,
+            end: 10,
             fg_colour: Color::White,
             bg_colour: Color::BrightYellow,
             intensity: Intensity::Normal,
@@ -752,6 +828,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 6,
+            end: 10,
             fg_colour: Color::White,
             bg_colour: Color::BrightBlue,
             intensity: Intensity::Normal,
@@ -771,6 +849,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 6,
+            end: 10,
             fg_colour: Color::White,
             bg_colour: Color::BrightMagenta,
             intensity: Intensity::Normal,
@@ -790,6 +870,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 6,
+            end: 10,
             fg_colour: Color::White,
             bg_colour: Color::BrightMagenta,
             intensity: Intensity::Normal,
@@ -809,6 +891,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 6,
+            end: 10,
             fg_colour: Color::White,
             bg_colour: Color::BrightCyan,
             intensity: Intensity::Normal,
@@ -828,6 +912,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 6,
+            end: 10,
             fg_colour: Color::White,
             bg_colour: Color::BrightWhite,
             intensity: Intensity::Normal,
@@ -847,6 +933,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 0,
+            end: 4,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -866,6 +954,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 0,
+            end: 4,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -885,6 +975,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Bold,
@@ -904,6 +996,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Faint,
@@ -923,6 +1017,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -942,6 +1038,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -961,6 +1059,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -980,6 +1080,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -999,6 +1101,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -1018,6 +1122,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -1037,6 +1143,8 @@ fn test_colored_function() {
         categorise_text(&String::from_utf8_lossy(&v))[0],
         CategorisedSlice {
             text: test_string,
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,

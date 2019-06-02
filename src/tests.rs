@@ -11,6 +11,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 0,
+            end: 4,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -29,6 +31,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -48,6 +52,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 4,
+            end: 8,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -66,6 +72,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 7,
+            end: 11,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -84,6 +92,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 7,
+            end: 11,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -102,6 +112,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 7,
+            end: 11,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -120,6 +132,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 7,
+            end: 11,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -138,6 +152,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 7,
+            end: 11,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -156,6 +172,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 7,
+            end: 11,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -174,6 +192,8 @@ fn cover_other_parameters() {
         categorise_text(&text[..])[0],
         CategorisedSlice {
             text: "test",
+            start: 7,
+            end: 11,
             fg_colour: Color::White,
             bg_colour: Color::Black,
             intensity: Intensity::Normal,
@@ -189,42 +209,47 @@ fn cover_other_parameters() {
 
 #[test]
 fn split_on_new_line_tests() {
+    fn fn_as_str(s: &str) -> (&str, Option<&str>) {
+        let (first, remainder) = split_on_new_line(s);
+        (&s[..first], remainder.map(|i| &s[i..]))
+    }
+
     // no remainder
-    let (first, remainder) = split_on_new_line("Hello worlds");
+    let (first, remainder) = fn_as_str("Hello worlds");
     assert_eq!(first, "Hello worlds");
     assert_eq!(remainder, None);
 
-    let (first, remainder) = split_on_new_line("Hello worlds\n");
+    let (first, remainder) = fn_as_str("Hello worlds\n");
     assert_eq!(first, "Hello worlds");
     assert_eq!(remainder, Some(""));
 
-    let (first, remainder) = split_on_new_line("Hello worlds\r\n");
+    let (first, remainder) = fn_as_str("Hello worlds\r\n");
     assert_eq!(first, "Hello worlds");
     assert_eq!(remainder, Some(""));
 
     // some remainder
-    let (first, remainder) = split_on_new_line("Hello worlds\none two three");
+    let (first, remainder) = fn_as_str("Hello worlds\none two three");
     assert_eq!(first, "Hello worlds");
     assert_eq!(remainder, Some("one two three"));
 
-    let (first, remainder) = split_on_new_line("Hello worlds\r\none two three");
+    let (first, remainder) = fn_as_str("Hello worlds\r\none two three");
     assert_eq!(first, "Hello worlds");
     assert_eq!(remainder, Some("one two three"));
 
-    let (first, remainder) = split_on_new_line("Hello worlds\r\none\ntwo\nthree\n");
+    let (first, remainder) = fn_as_str("Hello worlds\r\none\ntwo\nthree\n");
     assert_eq!(first, "Hello worlds");
     assert_eq!(remainder, Some("one\ntwo\nthree\n"));
 
     // no first
-    let (first, remainder) = split_on_new_line("\r\nHello worlds\none two three");
+    let (first, remainder) = fn_as_str("\r\nHello worlds\none two three");
     assert_eq!(first, "");
     assert_eq!(remainder, Some("Hello worlds\none two three"));
 
-    let (first, remainder) = split_on_new_line("\nHello worlds\r\none two three");
+    let (first, remainder) = fn_as_str("\nHello worlds\r\none two three");
     assert_eq!(first, "");
     assert_eq!(remainder, Some("Hello worlds\r\none two three"));
 
-    let (first, remainder) = split_on_new_line("\r\n");
+    let (first, remainder) = fn_as_str("\r\n");
     assert_eq!(first, "");
     assert_eq!(remainder, Some(""));
 }
@@ -234,19 +259,19 @@ fn clone_style_test() {
     use colored::*;
     let s = "hello".green();
     let c = categorise_text(&s);
-    let d = c[0].clone_style("why");
+    let d = c[0].clone_style("why", 0, 0);
 
     assert_eq!(d.text, "why");
 
-    let e = d.clone_style("hello");
+    let e = d.clone_style("hello", 0, 5);
 
     assert_eq!(c[0], e);
 }
 
 #[test]
 fn line_iter_test() {
-    let mut green = CategorisedSlice::default_style("");
-    let mut red = CategorisedSlice::default_style("");
+    let mut green = CategorisedSlice::default_style("", 0, 0);
+    let mut red = CategorisedSlice::default_style("", 0, 0);
     green.fg_colour = Color::Green;
     red.fg_colour = Color::Red;
 
@@ -254,7 +279,7 @@ fn line_iter_test() {
     let mut iter = line_iter(&cat);
     assert_eq!(
         iter.next(),
-        Some(vec![CategorisedSlice::default_style("hello, world")])
+        Some(vec![CategorisedSlice::default_style("hello, world", 0, 12)])
     );
     assert_eq!(iter.next(), None);
 
@@ -262,11 +287,11 @@ fn line_iter_test() {
     let mut iter = line_iter(&cat);
     assert_eq!(
         iter.next(),
-        Some(vec![CategorisedSlice::default_style("hello, world")])
+        Some(vec![CategorisedSlice::default_style("hello, world", 0, 12)])
     );
     assert_eq!(
         iter.next(),
-        Some(vec![CategorisedSlice::default_style("how are you")])
+        Some(vec![CategorisedSlice::default_style("how are you", 13, 24)])
     );
     assert_eq!(iter.next(), None);
 
@@ -275,12 +300,18 @@ fn line_iter_test() {
     let mut iter = line_iter(&cat);
     assert_eq!(
         iter.next(),
-        Some(vec![green.clone_style("hello, "), red.clone_style("world")])
+        Some(vec![
+            green.clone_style("hello, ", 5, 12),
+            red.clone_style("world", 21, 26)
+        ])
     );
     assert_eq!(
         iter.next(),
-        Some(vec![CategorisedSlice::default_style("how are you")])
+        Some(vec![CategorisedSlice::default_style("how are you", 31, 42)])
     );
+    assert_eq!(&s[5..12], "hello, ");
+    assert_eq!(&s[21..26], "world");
+    assert_eq!(&s[31..42], "how are you");
     assert_eq!(iter.next(), None);
 
     let s = format!(
@@ -292,40 +323,77 @@ fn line_iter_test() {
     let mut iter = line_iter(&cat);
     assert_eq!(
         iter.next(),
-        Some(vec![green.clone_style("hello, "), red.clone_style("world")])
+        Some(vec![
+            green.clone_style("hello, ", 5, 12),
+            red.clone_style("world", 21, 26)
+        ])
     );
     assert_eq!(
         iter.next(),
-        Some(vec![CategorisedSlice::default_style("how are you")])
+        Some(vec![CategorisedSlice::default_style("how are you", 31, 42)])
     );
     assert_eq!(
         iter.next(),
-        Some(vec![CategorisedSlice::default_style("today")])
+        Some(vec![CategorisedSlice::default_style("today", 44, 49)])
     );
     assert_eq!(iter.next(), None);
+    assert_eq!(&s[5..12], "hello, ");
+    assert_eq!(&s[21..26], "world");
+    assert_eq!(&s[31..42], "how are you");
+    assert_eq!(&s[44..49], "today");
 
     let cat = categorise_text("\n\n\n\n");
     let mut iter = line_iter(&cat);
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 0, 0)])
+    );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 1, 1)])
+    );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 2, 2)])
+    );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 3, 3)])
+    );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 4, 4)])
+    );
     assert_eq!(iter.next(), None);
 
     let cat = categorise_text("\r\n\r\n\r\n\r\n");
     let mut iter = line_iter(&cat);
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
-    assert_eq!(iter.next(), Some(vec![CategorisedSlice::default_style("")]));
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 0, 0)])
+    );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 2, 2)])
+    );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 4, 4)])
+    );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 6, 6)])
+    );
+    assert_eq!(
+        iter.next(),
+        Some(vec![CategorisedSlice::default_style("", 8, 8)])
+    );
     assert_eq!(iter.next(), None);
 }
 
 #[test]
 fn line_iter_newline_starts_with_esc() {
-    let mut green = CategorisedSlice::default_style("");
+    let mut green = CategorisedSlice::default_style("", 0, 0);
     green.fg_colour = Color::Green;
 
     let s = format!("hello\n{}", "world".green());
@@ -334,9 +402,10 @@ fn line_iter_newline_starts_with_esc() {
 
     assert_eq!(
         iter.next(),
-        Some(vec![CategorisedSlice::default_style("hello")])
+        Some(vec![CategorisedSlice::default_style("hello", 0, 5)])
     );
-    assert_eq!(iter.next(), Some(vec![green.clone_style("world")]));
+    assert_eq!(iter.next(), Some(vec![green.clone_style("world", 11, 16)]));
+    assert_eq!(&s[11..16], "world");
 }
 
 #[test]
@@ -353,14 +422,17 @@ fn line_iter_bugs() {
     let cat = categorise_text(bug_str);
     let mut iter = line_iter(&cat);
 
-    let mut cyan = CategorisedSlice::default_style("");
+    let mut cyan = CategorisedSlice::default_style("", 0, 0);
     cyan.fg_colour = Color::Cyan;
 
     assert_eq!(
         iter.next(),
         Some(vec![
-            cyan.clone_style("papyrus"),
-            CategorisedSlice::default_style("=> 5+6")
+            cyan.clone_style("papyrus", 5, 12),
+            CategorisedSlice::default_style("=> 5+6", 16, 22)
         ])
     );
+
+    assert_eq!(&bug_str[5..12], "papyrus");
+    assert_eq!(&bug_str[16..22], "=> 5+6");
 }

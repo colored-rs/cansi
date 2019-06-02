@@ -49,6 +49,8 @@ assert_eq!(
   result[0],
   CategorisedSlice {
     text: "Hello, ",
+    start: 0,
+    end: 7,
     fg_colour: Color::White,
     bg_colour: Color::Black,
     intensity: Intensity::Normal,
@@ -66,6 +68,8 @@ assert_eq!(
   result[1],
   CategorisedSlice {
     text: "w",
+    start: 15,
+    end: 16,
     fg_colour: Color::White,
     bg_colour: Color::Red,
     intensity: Intensity::Normal,

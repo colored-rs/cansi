@@ -20,7 +20,12 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
     for m in matches {
         // add in the text before CSI with the previous SGR format
         if m.start != lo {
-            slices.push(CategorisedSlice::with_sgr(sgr, &text, lo, m.start));
+            slices.push(CategorisedSlice::with_sgr(
+                sgr,
+                &text[lo..m.start],
+                lo,
+                m.start,
+            ));
         }
 
         sgr = handle_seq(&m);
@@ -29,7 +34,12 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
     }
 
     if lo != text.len() {
-        slices.push(CategorisedSlice::with_sgr(sgr, &text, lo, text.len()));
+        slices.push(CategorisedSlice::with_sgr(
+            sgr,
+            &text[lo..text.len()],
+            lo,
+            text.len(),
+        ));
     }
 
     slices

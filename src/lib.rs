@@ -49,6 +49,8 @@
 //!   result[0],
 //!   CategorisedSlice {
 //!     text: "Hello, ",
+//!     start: 0,
+//!     end: 7,
 //!     fg_colour: Color::White,
 //!     bg_colour: Color::Black,
 //!     intensity: Intensity::Normal,
@@ -66,6 +68,8 @@
 //!   result[1],
 //!   CategorisedSlice {
 //!     text: "w",
+//!     start: 15,
+//!     end: 16,
 //!     fg_colour: Color::White,
 //!     bg_colour: Color::Red,
 //!     intensity: Intensity::Normal,
@@ -194,11 +198,15 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 
             // push first slice on -- only if not empty
             // if first.len() == 0 it is because there is a sequence of new lines
-            v.push(prev.clone_style(first));
+            v.push(prev.clone_style(&prev.text[..first], prev.start, prev.start + first));
 
             if let Some(remainder) = remainder {
                 // there is a remainder, which means that a new line was hit
-                self.prev = Some(prev.clone_style(remainder));
+                self.prev = Some(prev.clone_style(
+                    &prev.text[remainder..],
+                    prev.start + remainder,
+                    prev.end,
+                ));
                 return Some(v); // exit early
             }
 
@@ -211,15 +219,19 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
             let (first, remainder) = split_on_new_line(slice.text);
 
             // push first slice on -- only if not empty
-            if first.len() > 0 || v.len() == 0 {
-                v.push(slice.clone_style(first));
+            if first > 0 || v.len() == 0 {
+                v.push(slice.clone_style(&slice.text[..first], slice.start, slice.start + first));
             }
 
             if let Some(remainder) = remainder {
                 // there is a remainder, which means that a new line was hit
-                if remainder.len() > 0 {
+                if slice.text[remainder..].len() > 0 {
                     // not just a trailing new line.
-                    self.prev = Some(slice.clone_style(remainder));
+                    self.prev = Some(slice.clone_style(
+                        &slice.text[remainder..],
+                        slice.start + remainder,
+                        slice.end,
+                    ));
                 }
                 break; // exit looping
             }
@@ -234,21 +246,24 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 }
 
 /// Splits on the first instance of `\r\n` or `\n` bytes.
-/// Returns the first split slice, and the remainder slice if there is a split and items afterwards.
+/// Returns the _exclusive_ end of the first componenet, and the _inclusive_ start of the remaining items if there is a split.
 /// Can return an empty remainder slice (if terminated with a new line). Can return empty first slice (say `"\nHello"`);
 fn split_on_new_line(txt: &str) -> (usize, Option<usize>) {
-	let cr = txt.find('\r');
-	let nl = txt.find('\n');
+    let cr = txt.find('\r');
+    let nl = txt.find('\n');
 
-	let first = 
-
-    let mut split = txt.splitn(2, '\n'); // split on new line byte
-
-    let first = split.next().expect("should be one I guess?"); // get the first return
-
-    let first = first.trim_matches('\r');
-
-    (first, split.next())
+    match (cr, nl) {
+        (None, None) => (txt.len(), None),
+        (Some(_), None) => (txt.len(), None), // special case, no new line but cr
+        (None, Some(nl)) => (nl, Some(nl + 1)),
+        (Some(cr), Some(nl)) => {
+            if nl.saturating_sub(1) == cr {
+                (cr, Some(nl + 1))
+            } else {
+                (nl, Some(nl + 1))
+            }
+        }
+    }
 }
 
 /// Data structure that holds information about colouring and styling of a text slice.
@@ -256,10 +271,10 @@ fn split_on_new_line(txt: &str) -> (usize, Option<usize>) {
 pub struct CategorisedSlice<'text> {
     /// The text slice.
     pub text: &'text str,
-	/// _Inclusive_ starting byte position.
-	pub start: usize,
-	/// _Exclusive_ ending byte position.
-	pub end: usize,
+    /// _Inclusive_ starting byte position.
+    pub start: usize,
+    /// _Exclusive_ ending byte position.
+    pub end: usize,
 
     /// The foreground (or text) colour.
     pub fg_colour: Color,
@@ -268,7 +283,7 @@ pub struct CategorisedSlice<'text> {
 
     /// The emphasis state (bold, faint, normal).
     pub intensity: Intensity,
-	
+
     /// Italicised.
     pub italic: bool,
     /// Underlined.
@@ -285,7 +300,7 @@ pub struct CategorisedSlice<'text> {
 }
 
 impl<'text> CategorisedSlice<'text> {
-    fn with_sgr(sgr: SGR, original: &'text str, start: usize, end: usize) -> Self {
+    const fn with_sgr(sgr: SGR, text: &'text str, start: usize, end: usize) -> Self {
         let SGR {
             fg_colour,
             bg_colour,
@@ -299,9 +314,9 @@ impl<'text> CategorisedSlice<'text> {
         } = sgr;
 
         Self {
-            text: &original[start..end],
-			start: start,
-			end: end,
+            text: text,
+            start: start,
+            end: end,
             fg_colour: fg_colour,
             bg_colour: bg_colour,
             intensity: intensity,
@@ -314,17 +329,17 @@ impl<'text> CategorisedSlice<'text> {
         }
     }
 
-    const fn clone_style(&self, original: &'text str, start: usize, end: usize) -> Self {
+    const fn clone_style(&self, text: &'text str, start: usize, end: usize) -> Self {
         let mut c = *self;
-        c.text = &original[start..end];
-		c.start = start;
-		c.end = end;
+        c.text = text;
+        c.start = start;
+        c.end = end;
         c
     }
 
     #[cfg(test)]
-    const fn default_style(original: &'text str, start: usize, end: usize) -> Self {
-        Self::with_sgr(SGR::default(), original, start, end)
+    const fn default_style(text: &'text str, start: usize, end: usize) -> Self {
+        Self::with_sgr(SGR::default(), text, start, end)
     }
 }
 
