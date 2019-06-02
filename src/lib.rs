@@ -236,7 +236,12 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 /// Splits on the first instance of `\r\n` or `\n` bytes.
 /// Returns the first split slice, and the remainder slice if there is a split and items afterwards.
 /// Can return an empty remainder slice (if terminated with a new line). Can return empty first slice (say `"\nHello"`);
-fn split_on_new_line(txt: &str) -> (&str, Option<&str>) {
+fn split_on_new_line(txt: &str) -> (usize, Option<usize>) {
+	let cr = txt.find('\r');
+	let nl = txt.find('\n');
+
+	let first = 
+
     let mut split = txt.splitn(2, '\n'); // split on new line byte
 
     let first = split.next().expect("should be one I guess?"); // get the first return
@@ -251,16 +256,24 @@ fn split_on_new_line(txt: &str) -> (&str, Option<&str>) {
 pub struct CategorisedSlice<'text> {
     /// The text slice.
     pub text: &'text str,
+	/// _Inclusive_ starting byte position.
+	pub start: usize,
+	/// _Exclusive_ ending byte position.
+	pub end: usize,
+
     /// The foreground (or text) colour.
     pub fg_colour: Color,
     /// The background colour.
     pub bg_colour: Color,
+
     /// The emphasis state (bold, faint, normal).
     pub intensity: Intensity,
+	
     /// Italicised.
     pub italic: bool,
     /// Underlined.
     pub underline: bool,
+
     /// Slow blink text.
     pub blink: bool,
     /// Inverted colours. See [https://en.wikipedia.org/wiki/Reverse_video](https://en.wikipedia.org/wiki/Reverse_video).
@@ -272,7 +285,7 @@ pub struct CategorisedSlice<'text> {
 }
 
 impl<'text> CategorisedSlice<'text> {
-    const fn with_sgr(sgr: SGR, txt: &'text str) -> Self {
+    fn with_sgr(sgr: SGR, original: &'text str, start: usize, end: usize) -> Self {
         let SGR {
             fg_colour,
             bg_colour,
@@ -286,7 +299,9 @@ impl<'text> CategorisedSlice<'text> {
         } = sgr;
 
         Self {
-            text: txt,
+            text: &original[start..end],
+			start: start,
+			end: end,
             fg_colour: fg_colour,
             bg_colour: bg_colour,
             intensity: intensity,
@@ -299,15 +314,17 @@ impl<'text> CategorisedSlice<'text> {
         }
     }
 
-    const fn clone_style(&self, txt: &'text str) -> Self {
+    const fn clone_style(&self, original: &'text str, start: usize, end: usize) -> Self {
         let mut c = *self;
-        c.text = txt;
+        c.text = &original[start..end];
+		c.start = start;
+		c.end = end;
         c
     }
 
     #[cfg(test)]
-    const fn default_style(txt: &'text str) -> Self {
-        Self::with_sgr(SGR::default(), txt)
+    const fn default_style(original: &'text str, start: usize, end: usize) -> Self {
+        Self::with_sgr(SGR::default(), original, start, end)
     }
 }
 
