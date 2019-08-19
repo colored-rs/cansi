@@ -79,7 +79,17 @@
 //! );
 //! ```
 
+
+#![cfg_attr(not(feature = "std"), no_std)]
 #![warn(missing_docs)]
+
+#[cfg(feature = "alloc")]
+extern crate alloc;
+
+#[cfg(all(not(feature = "std"), feature = "alloc"))]
+use alloc::vec::Vec;
+#[cfg(all(not(feature = "std"), feature = "alloc"))]
+use alloc::string::String;
 
 mod categorise;
 mod parsing;

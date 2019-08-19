@@ -11,6 +11,11 @@ readme = "README.md"
 keywords = [ "ansi", "parsing", "terminal" ]
 edition = "2018"
 
+[features]
+default = ["std"]
+std = []
+alloc = []
+
 [dependencies]
 
 [dev-dependencies]

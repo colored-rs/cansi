@@ -1,3 +1,6 @@
+#[cfg(all(not(feature = "std"), feature = "alloc"))]
+use alloc::vec::Vec;
+
 /// A match.
 pub struct Match<'t> {
     /// First byte index.

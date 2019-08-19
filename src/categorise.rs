@@ -1,5 +1,8 @@
 use super::*;
 
+#[cfg(all(not(feature = "std"), feature = "alloc"))]
+use alloc::vec::Vec;
+
 const SEPARATOR: char = ';';
 
 /// Parses the text and returns each formatted slice in order.
