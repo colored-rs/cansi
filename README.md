@@ -12,6 +12,16 @@ Look at progress and contribute on [github.](https://github.com/kurtlawrence/can
 
 `cansi` will parse text with ANSI escape sequences in it and return a deconstructed text with metadata around the colouring and styling. `cansi` is only concerned with `CSI` sequences, particuarly the `SGR` parameters. `cansi` will not construct escaped text, there are crates such as [`colored`](https://crates.io/crates/colored) that do a great job of colouring and styling text.
 
+## Targeting no_std
+This crate can use `alloc` in place of the standard library for no_std targets.
+The standard library is enabled by default, so disabling default features and enabling the
+`alloc` feature is required to use the crate this way.
+
+```toml
+[dependencies]
+cansi = { version = "2.1.0", default-features = false, features = ["alloc"] }
+```
+
 ## Example usage
 
 > This example was done using the `colored` crate to help with constructing the escaped text string. It will work with other tools that inject escape sequences into text strings (given they follow [ANSI specification](https://en.wikipedia.org/wiki/ANSI_escape_code)).

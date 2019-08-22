@@ -1,15 +1,20 @@
 [package]
 name = "cansi"
 description = "Catergorise ANSI - ANSI escape code parser and categoriser"
-version = "2.0.0"
+version = "2.1.0"
 authors = ["kurt <kurtlawrence92@gmail.com>"]
 license = "MIT"
 homepage = "https://github.com/kurtlawrence/cansi"
 repository = "https://github.com/kurtlawrence/cansi"
 documentation = "https://docs.rs/cansi/"
 readme = "README.md"
-keywords = [ "ansi", "parsing", "terminal" ]
+keywords = [ "ansi", "parsing", "terminal", "no_std" ]
 edition = "2018"
+
+[features]
+default = ["std"]
+std = []
+alloc = []
 
 [dependencies]
 
