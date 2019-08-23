@@ -1,5 +1,9 @@
 # Change Log
 
+## v2.1.0
+
+- Added `start` and `end` byte positions to `CategorisedSlice`.
+
 ## v2.0.0
 
 - Moved `colored` crate out of dependencies and into dev-dependency.
