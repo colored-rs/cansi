@@ -1,6 +1,9 @@
 use super::*;
 use colored::Colorize;
 
+#[cfg(all(not(feature = "std"), feature = "alloc"))]
+use alloc::vec::Vec;
+
 #[test]
 fn cover_other_parameters() {
     // colored doesn't always test all match arms, so i test here
