@@ -25,6 +25,8 @@ before_cache: |
   fi
 
 script:
+  - cargo fmt -- --check
+  - cargo clippy
   - cargo build
   - cargo test
 
