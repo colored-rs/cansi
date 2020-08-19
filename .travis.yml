@@ -2,6 +2,10 @@ sudo: required
 language: rust
 cache: cargo
 
+before_script:
+  - rustup component add clippy
+  - rustup component add rustfmt
+
 matrix:
   include:
     - os: linux
@@ -21,7 +25,7 @@ matrix:
 
 before_cache: |
   if [[ "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_RUST_VERSION" == nightly ]]; then
-    RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin
+    cargo install cargo-tarpaulin
   fi
 
 script:
