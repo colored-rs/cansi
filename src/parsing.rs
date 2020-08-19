@@ -2,6 +2,7 @@
 use alloc::vec::Vec;
 
 /// A match.
+#[derive(Debug, PartialEq)]
 pub struct Match<'t> {
     /// First byte index.
     pub start: usize,
@@ -77,5 +78,13 @@ mod tests {
             .map(|m| (m.start, m.end))
             .collect();
         assert_eq!(&parsed, &[(7, 14), (19, 23)],);
+    }
+
+    #[test]
+    fn parse_string_with_different_chars() {
+        let t = "👋, \x1b[31;4m🌍\x1b[0m!";
+        let parsed = parse(t);
+        dbg!(parsed);
+        panic!();
     }
 }

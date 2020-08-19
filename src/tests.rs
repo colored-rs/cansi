@@ -439,3 +439,16 @@ fn line_iter_bugs() {
     assert_eq!(&bug_str[5..12], "papyrus");
     assert_eq!(&bug_str[16..22], "=> 5+6");
 }
+
+#[test]
+fn byte_bug() {
+    let s = "ﾮ";
+    let matches = parse(s);
+    dbg!(&matches);
+    panic!();
+
+
+    let x = categorise_text(&s);
+    let c = construct_text_no_codes(&x);
+    assert_eq!(s, c);
+}
