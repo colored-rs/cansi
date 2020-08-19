@@ -19,8 +19,8 @@ alloc = []
 [dependencies]
 
 [dev-dependencies]
-criterion = "0.2"
-colored = "1.7.0"
+criterion = "0.3"
+colored = "2"
 
 [[bench]]
 name = "benches"

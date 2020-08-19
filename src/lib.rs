@@ -20,12 +20,10 @@
 //! > text string. It will work with other tools that inject escape sequences into text strings (given they follow [ANSI specification](https://en.wikipedia.org/wiki/ANSI_escape_code)).
 //!
 //! ```rust
-//! extern crate cansi;
-//! extern crate colored;
-//!
-//! use cansi::*;
-//! use colored::Colorize;
-//! use std::io::Write;
+//! # use cansi::*;
+//! # use colored::Colorize;
+//! # use std::io::Write;
+//! # colored::control::set_override(true);
 //!
 //! let v = &mut Vec::new();
 //! write!(
@@ -147,8 +145,9 @@ pub fn construct_text_no_codes(categorised_slices: &CategorisedSlices) -> String
 ///
 /// # Example
 /// ```rust
-/// use colored::Colorize;
-/// use cansi::*;
+/// # use colored::Colorize;
+/// # use cansi::*;
+/// # colored::control::set_override(true);
 ///
 /// let s = format!("{}{}\nhow are you\r\ntoday", "hello, ".green(), "world".red());
 /// let cat = categorise_text(&s);
@@ -180,8 +179,9 @@ pub fn line_iter<'text, 'iter>(
 ///
 /// # Example
 /// ```rust
-/// use colored::Colorize;
-/// use cansi::*;
+/// # use colored::Colorize;
+/// # colored::control::set_override(true);
+/// # use cansi::*;
 ///
 /// let s = format!("{}{}\nhow are you\r\ntoday", "hello, ".green(), "world".red());
 /// let cat = categorise_text(&s);
