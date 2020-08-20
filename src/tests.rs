@@ -444,11 +444,74 @@ fn line_iter_bugs() {
 fn byte_bug() {
     let s = "ﾮ";
     let matches = parse(s);
-    dbg!(&matches);
-    panic!();
-
+    assert_eq!(matches, vec![]);
 
     let x = categorise_text(&s);
     let c = construct_text_no_codes(&x);
     assert_eq!(s, c);
+}
+
+#[test]
+fn colouring_with_emojis() {
+    let t = "👋, \x1b[31;4m🌍\x1b[0m!";
+    let c = categorise_text(t);
+    assert_eq!(construct_text_no_codes(&c), "👋, 🌍!");
+
+    let mut c = c.into_iter();
+
+    assert_eq!(
+        c.next(),
+        Some(CategorisedSlice {
+            text: "👋, ",
+            start: 0,
+            end: 6,
+            fg_colour: Color::White,
+            bg_colour: Color::Black,
+            intensity: Intensity::Normal,
+            italic: false,
+            underline: false,
+            blink: false,
+            reversed: false,
+            hidden: false,
+            strikethrough: false
+        })
+    );
+
+    assert_eq!(
+        c.next(),
+        Some(CategorisedSlice {
+            text: "🌍",
+            start: 13,
+            end: 17,
+            fg_colour: Color::Red,
+            bg_colour: Color::Black,
+            intensity: Intensity::Normal,
+            italic: false,
+            underline: true,
+            blink: false,
+            reversed: false,
+            hidden: false,
+            strikethrough: false
+        })
+    );
+
+    assert_eq!(
+        c.next(),
+        Some(CategorisedSlice {
+            text: "!",
+            start: 21,
+            end: 22,
+            fg_colour: Color::White,
+            bg_colour: Color::Black,
+            intensity: Intensity::Normal,
+            italic: false,
+            underline: false,
+            blink: false,
+            reversed: false,
+            hidden: false,
+            strikethrough: false
+        })
+    );
+
+    assert_eq!(c.next(), None);
 }
