@@ -4,6 +4,11 @@
 
 - Added `start` and `end` byte positions to `CategorisedSlice`.
 
+> v2.1.1
+>
+> - fix bug in parsing characters with more than 1 byte length.
+> - general performance improvement with parsing fix.
+
 ## v2.0.0
 
 - Moved `colored` crate out of dependencies and into dev-dependency.
