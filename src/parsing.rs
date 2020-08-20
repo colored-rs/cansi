@@ -27,7 +27,7 @@ fn terminated_byte(byte: u8) -> bool {
 /// let ansi_text = "Hello, \x1b[31;4mworld\x1b[0m!";
 /// let parsed: Vec<_> = cansi::parse(ansi_text)
 ///     .into_iter()
-/// 	.map(|m| (m.start, m.end))
+///     .map(|m| (m.start, m.end))
 ///     .collect();
 /// assert_eq!(
 ///     parsed,

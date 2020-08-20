@@ -247,7 +247,7 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
 
             if let Some(remainder) = remainder {
                 // there is a remainder, which means that a new line was hit
-                if slice.text[remainder..].len() > 0 {
+                if !slice.text[remainder..].is_empty() {
                     // not just a trailing new line.
                     self.prev = Some(slice.clone_style(
                         &slice.text[remainder..],
@@ -259,7 +259,7 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
             }
         }
 
-        if v.len() == 0 && self.idx >= self.slices.len() {
+        if v.is_empty() && self.idx >= self.slices.len() {
             None // stop iterating if no slices were met and the index is above the slices len
         } else {
             Some(v)
@@ -336,18 +336,18 @@ impl<'text> CategorisedSlice<'text> {
         } = sgr;
 
         Self {
-            text: text,
-            start: start,
-            end: end,
-            fg_colour: fg_colour,
-            bg_colour: bg_colour,
-            intensity: intensity,
-            italic: italic,
-            underline: underline,
-            blink: blink,
-            reversed: reversed,
-            hidden: hidden,
-            strikethrough: strikethrough,
+            text,
+            start,
+            end,
+            fg_colour,
+            bg_colour,
+            intensity,
+            italic,
+            underline,
+            blink,
+            reversed,
+            hidden,
+            strikethrough,
         }
     }
 
