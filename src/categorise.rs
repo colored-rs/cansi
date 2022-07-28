@@ -12,6 +12,7 @@ const SEPARATOR: char = ';';
 /// There is a helper function (`construct_text_no_codes`) on `CategorisedSlices` for this.
 #[deprecated = "please use v3::categorise_text to move to API v3.0. \
                 this function will be removed with v3.0 of cansi"]
+#[allow(deprecated)]
 pub fn categorise_text(text: &str) -> CategorisedSlices {
     categorise_text_v3(text)
         .into_iter()

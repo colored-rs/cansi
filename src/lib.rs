@@ -111,10 +111,14 @@ mod parsing;
 #[cfg(test)]
 mod tests;
 
+#[allow(deprecated)]
 pub use categorise::categorise_text;
 pub use parsing::{parse, Match};
 
 /// Type definition of the collection of `CategorisedSlice`s.
+#[deprecated = "please use v3::CategorisedSlices to move to API v3.0. \
+                this function will be removed with v3.0 of cansi"]
+#[allow(deprecated)]
 pub type CategorisedSlices<'text> = Vec<CategorisedSlice<'text>>;
 
 /// Constructs a string of the categorised text without the ANSI escape characters.
@@ -127,6 +131,7 @@ pub type CategorisedSlices<'text> = Vec<CategorisedSlice<'text>>;
 /// ```
 #[deprecated = "please use v3::construct_text_no_codes to move to API v3.0. \
                 this function will be removed with v3.0 of cansi"]
+#[allow(deprecated)]
 pub fn construct_text_no_codes(categorised_slices: &CategorisedSlices) -> String {
     let x = categorised_slices.iter().cloned().map(Into::into).collect();
     v3::construct_text_no_codes(&x)
@@ -156,6 +161,9 @@ pub fn construct_text_no_codes(categorised_slices: &CategorisedSlices) -> String
 /// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "today");
 /// assert_eq!(iter.next(), None);
 /// ```
+#[deprecated = "please use v3::line_iter to move to API v3.0. \
+                this function will be removed with v3.0 of cansi"]
+#[allow(deprecated)]
 pub fn line_iter<'text, 'iter>(
     categorised_slices: &'iter CategorisedSlices<'text>,
 ) -> CategorisedLineIterator<'text, 'iter> {
@@ -190,6 +198,9 @@ pub fn line_iter<'text, 'iter>(
 /// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "today");
 /// assert_eq!(iter.next(), None);
 /// ```
+#[deprecated = "please use v3::CategorisedLineIterator to move to API v3.0. \
+                this function will be removed with v3.0 of cansi"]
+#[allow(deprecated)]
 pub struct CategorisedLineIterator<'text, 'iter> {
     slices: &'iter CategorisedSlices<'text>,
     idx: usize,
@@ -200,8 +211,12 @@ pub struct CategorisedLineIterator<'text, 'iter> {
 ///
 /// # Note
 /// > The type alias is the same as `CategorisedSlices`, so functions such as `construct_text_no_codes` will work.
+#[deprecated = "please use v3::CategorisedLine to move to API v3.0. \
+                this function will be removed with v3.0 of cansi"]
+#[allow(deprecated)]
 pub type CategorisedLine<'text> = Vec<CategorisedSlice<'text>>;
 
+#[allow(deprecated)]
 impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
     type Item = CategorisedLine<'text>;
     fn next(&mut self) -> Option<Self::Item> {
@@ -283,6 +298,8 @@ fn split_on_new_line(txt: &str) -> (usize, Option<usize>) {
 
 /// Data structure that holds information about colouring and styling of a text slice.
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[deprecated = "please use v3::CategorisedSlice to move to API v3.0. \
+                this function will be removed with v3.0 of cansi"]
 pub struct CategorisedSlice<'text> {
     /// The text slice.
     pub text: &'text str,
@@ -314,6 +331,7 @@ pub struct CategorisedSlice<'text> {
     pub strikethrough: bool,
 }
 
+#[allow(deprecated)]
 impl<'text> CategorisedSlice<'text> {
     const fn clone_style(&self, text: &'text str, start: usize, end: usize) -> Self {
         let mut c = *self;
@@ -330,6 +348,7 @@ impl<'text> CategorisedSlice<'text> {
 }
 
 /// Populates with defaults.
+#[allow(deprecated)]
 impl<'a> From<v3::CategorisedSlice<'a>> for CategorisedSlice<'a> {
     fn from(x: v3::CategorisedSlice<'a>) -> Self {
         let v3::CategorisedSlice {
@@ -364,6 +383,7 @@ impl<'a> From<v3::CategorisedSlice<'a>> for CategorisedSlice<'a> {
     }
 }
 
+#[allow(deprecated)]
 impl<'a> From<CategorisedSlice<'a>> for v3::CategorisedSlice<'a> {
     fn from(x: CategorisedSlice<'a>) -> Self {
         let CategorisedSlice {
