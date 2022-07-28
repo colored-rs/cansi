@@ -125,19 +125,11 @@ pub type CategorisedSlices<'text> = Vec<CategorisedSlice<'text>>;
 /// let categorised = categorise_text("\x1b[30mH\x1b[31me\x1b[32ml\x1b[33ml\x1b[34mo");
 /// assert_eq!("Hello", &construct_text_no_codes(&categorised));
 /// ```
+#[deprecated = "please use v3::construct_text_no_codes to move to API v3.0. \
+                this function will be removed with v3.0 of cansi"]
 pub fn construct_text_no_codes(categorised_slices: &CategorisedSlices) -> String {
-    let slices = categorised_slices;
-    let mut s = String::with_capacity(
-        categorised_slices
-            .iter()
-            .map(|x| x.text.len())
-            .sum::<usize>(),
-    );
-    for sl in slices {
-        s.push_str(sl.text);
-    }
-
-    s
+    let x = categorised_slices.iter().cloned().map(Into::into).collect();
+    v3::construct_text_no_codes(&x)
 }
 
 /// Construct an iterator over each new line (`\n` or `\r\n`) and returns the categorised slices within those.
@@ -368,6 +360,40 @@ impl<'a> From<v3::CategorisedSlice<'a>> for CategorisedSlice<'a> {
             reversed: reversed.unwrap_or_default(),
             hidden: hidden.unwrap_or_default(),
             strikethrough: strikethrough.unwrap_or_default(),
+        }
+    }
+}
+
+impl<'a> From<CategorisedSlice<'a>> for v3::CategorisedSlice<'a> {
+    fn from(x: CategorisedSlice<'a>) -> Self {
+        let CategorisedSlice {
+            text,
+            start,
+            end,
+            fg_colour,
+            bg_colour,
+            intensity,
+            italic,
+            underline,
+            blink,
+            reversed,
+            hidden,
+            strikethrough,
+        } = x;
+
+        Self {
+            text,
+            start,
+            end,
+            fg: Some(fg_colour),
+            bg: Some(bg_colour),
+            intensity: Some(intensity),
+            italic: Some(italic),
+            underline: Some(underline),
+            blink: Some(blink),
+            reversed: Some(reversed),
+            hidden: Some(hidden),
+            strikethrough: Some(strikethrough),
         }
     }
 }
