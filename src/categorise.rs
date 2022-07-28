@@ -48,6 +48,49 @@ pub fn categorise_text(text: &str) -> CategorisedSlices {
     slices
 }
 
+/// Parses the text and returns each formatted slice in order.
+/// The ANSI escape codes are not included in the text slices.
+///
+/// Each different text slice is returned in order such that the text without the escape characters can be reconstructed.
+/// There is a helper function (`construct_text_no_codes`) on `CategorisedSlices` for this.
+pub fn categorise_text_v3(text: &str) -> v3::CategorisedSlices {
+    let matches = parse(text);
+
+    let mut sgr = SGR::default();
+
+    let mut lo = 0;
+
+    // will always less than or equal to matches + 1 in length, see tests
+    let mut slices: Vec<v3::CategorisedSlice> = Vec::with_capacity(matches.len() + 1);
+
+    for m in matches {
+        // add in the text before CSI with the previous SGR format
+        if m.start != lo {
+            slices.push(v3::CategorisedSlice::with_sgr(
+                sgr,
+                &text[lo..m.start],
+                lo,
+                m.start,
+            ));
+        }
+
+        sgr = handle_seq(&m);
+
+        lo = m.end;
+    }
+
+    if lo != text.len() {
+        slices.push(v3::CategorisedSlice::with_sgr(
+            sgr,
+            &text[lo..text.len()],
+            lo,
+            text.len(),
+        ));
+    }
+
+    slices
+}
+
 /// Produce an `SGR` from a styling sequence.
 ///
 /// Requires `Match` as we can assume skipping of certain bytes.
