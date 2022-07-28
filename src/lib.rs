@@ -472,8 +472,8 @@ pub enum Color {
 /// only require a change in import code.
 /// Note that version 3.0 will remove the deprecated version 2.0 items.
 pub mod v3 {
-    use super::split_on_new_line;
-    use crate::{Color, Intensity, SGR};
+    use super::{SGR, split_on_new_line};
+    pub use crate::{Color, Intensity};
 
     pub use super::categorise::categorise_text_v3 as categorise_text;
 
@@ -569,7 +569,7 @@ pub mod v3 {
     /// # Example
     /// ```rust
     /// # use colored::Colorize;
-    /// # use cansi::*;
+    /// # use cansi::v3::*;
     /// # colored::control::set_override(true);
     ///
     /// let s = format!("{}{}\nhow are you\r\ntoday", "hello, ".green(), "world".red());
@@ -578,10 +578,10 @@ pub mod v3 {
     ///
     /// let first = iter.next().unwrap();
     /// assert_eq!(first[0].text, "hello, ");
-    /// assert_eq!(first[0].fg_colour, Color::Green);
+    /// assert_eq!(first[0].fg, Some(Color::Green));
     ///
     /// assert_eq!(first[1].text, "world");
-    /// assert_eq!(first[1].fg_colour, Color::Red);
+    /// assert_eq!(first[1].fg, Some(Color::Red));
     ///
     /// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "how are you");
     /// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "today");
@@ -604,7 +604,7 @@ pub mod v3 {
     /// ```rust
     /// # use colored::Colorize;
     /// # colored::control::set_override(true);
-    /// # use cansi::*;
+    /// # use cansi::v3::*;
     ///
     /// let s = format!("{}{}\nhow are you\r\ntoday", "hello, ".green(), "world".red());
     /// let cat = categorise_text(&s);
@@ -612,10 +612,10 @@ pub mod v3 {
     ///
     /// let first = iter.next().unwrap();
     /// assert_eq!(first[0].text, "hello, ");
-    /// assert_eq!(first[0].fg_colour, Color::Green);
+    /// assert_eq!(first[0].fg, Some(Color::Green));
     ///
     /// assert_eq!(first[1].text, "world");
-    /// assert_eq!(first[1].fg_colour, Color::Red);
+    /// assert_eq!(first[1].fg, Some(Color::Red));
     ///
     /// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "how are you");
     /// assert_eq!(&construct_text_no_codes(&iter.next().unwrap()), "today");
@@ -693,7 +693,7 @@ pub mod v3 {
     ///
     /// # Example
     /// ```rust
-    /// use cansi::*;
+    /// use cansi::v3::*;
     /// let categorised = categorise_text("\x1b[30mH\x1b[31me\x1b[32ml\x1b[33ml\x1b[34mo");
     /// assert_eq!("Hello", &construct_text_no_codes(&categorised));
     /// ```
