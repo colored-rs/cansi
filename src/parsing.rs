@@ -18,7 +18,7 @@ const CSI: &str = "\x1b[";
 
 #[inline(always)]
 fn terminated_byte(byte: u8) -> bool {
-    byte >= 0x40 && byte <= 0x7e
+    (0x40..=0x7e).contains(&byte)
 }
 
 /// Parses ANSI escape codes from the given text, returning a vector of `Match`.
@@ -52,7 +52,7 @@ pub fn parse(text: &str) -> Vec<Match> {
             let end = end + 1;
 
             v.push(Match {
-                start: start,
+                start,
                 end,
                 text: &text[start..end],
             });
