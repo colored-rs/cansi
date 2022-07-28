@@ -323,35 +323,6 @@ pub struct CategorisedSlice<'text> {
 }
 
 impl<'text> CategorisedSlice<'text> {
-    const fn with_sgr(sgr: SGR, text: &'text str, start: usize, end: usize) -> Self {
-        let SGR {
-            fg_colour,
-            bg_colour,
-            intensity,
-            italic,
-            underline,
-            blink,
-            reversed,
-            hidden,
-            strikethrough,
-        } = sgr;
-
-        Self {
-            text,
-            start,
-            end,
-            fg_colour,
-            bg_colour,
-            intensity,
-            italic,
-            underline,
-            blink,
-            reversed,
-            hidden,
-            strikethrough,
-        }
-    }
-
     const fn clone_style(&self, text: &'text str, start: usize, end: usize) -> Self {
         let mut c = *self;
         c.text = text;
@@ -361,15 +332,28 @@ impl<'text> CategorisedSlice<'text> {
     }
 
     #[cfg(test)]
-    const fn default_style(text: &'text str, start: usize, end: usize) -> Self {
-        Self::with_sgr(SGR::default(), text, start, end)
+    fn default_style(text: &'text str, start: usize, end: usize) -> Self {
+        v3::CategorisedSlice::with_sgr(SGR::default(), text, start, end).into()
     }
 }
 
 /// Populates with defaults.
 impl<'a> From<v3::CategorisedSlice<'a>> for CategorisedSlice<'a> {
     fn from(x: v3::CategorisedSlice<'a>) -> Self {
-        let v3::CategorisedSlice { text, start, end, fg, bg, intensity, italic, underline, blink, reversed, hidden, strikethrough } = x;
+        let v3::CategorisedSlice {
+            text,
+            start,
+            end,
+            fg,
+            bg,
+            intensity,
+            italic,
+            underline,
+            blink,
+            reversed,
+            hidden,
+            strikethrough,
+        } = x;
 
         Self {
             text,
@@ -390,17 +374,17 @@ impl<'a> From<v3::CategorisedSlice<'a>> for CategorisedSlice<'a> {
 
 /// The formatting components `SGR (Select Graphic Rendition)`.
 /// [spec](https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters)
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 struct SGR {
-    fg_colour: Color,
-    bg_colour: Color,
-    intensity: Intensity,
-    italic: bool,
-    underline: bool,
-    blink: bool,
-    reversed: bool,
-    hidden: bool,
-    strikethrough: bool,
+    fg: Option<Color>,
+    bg: Option<Color>,
+    intensity: Option<Intensity>,
+    italic: Option<bool>,
+    underline: Option<bool>,
+    blink: Option<bool>,
+    reversed: Option<bool>,
+    hidden: Option<bool>,
+    strikethrough: Option<bool>,
 }
 
 /// The emphasis (bold, faint) states.
@@ -434,22 +418,6 @@ pub enum Color {
     BrightMagenta,
     BrightCyan,
     BrightWhite,
-}
-
-impl SGR {
-    const fn default() -> Self {
-        SGR {
-            fg_colour: Color::White,
-            bg_colour: Color::Black,
-            intensity: Intensity::Normal,
-            italic: false,
-            underline: false,
-            blink: false,
-            reversed: false,
-            hidden: false,
-            strikethrough: false,
-        }
-    }
 }
 
 /// Update API for version 3.0 of the crate.
@@ -498,33 +466,32 @@ pub mod v3 {
 
     impl<'text> CategorisedSlice<'text> {
         pub(crate) const fn with_sgr(sgr: SGR, text: &'text str, start: usize, end: usize) -> Self {
-            todo!();
-            //         let SGR {
-            //             fg_colour,
-            //             bg_colour,
-            //             intensity,
-            //             italic,
-            //             underline,
-            //             blink,
-            //             reversed,
-            //             hidden,
-            //             strikethrough,
-            //         } = sgr;
-            //
-            //         Self {
-            //             text,
-            //             start,
-            //             end,
-            //             fg_colour,
-            //             bg_colour,
-            //             intensity,
-            //             italic,
-            //             underline,
-            //             blink,
-            //             reversed,
-            //             hidden,
-            //             strikethrough,
-            //         }
+            let SGR {
+                fg,
+                bg,
+                intensity,
+                italic,
+                underline,
+                blink,
+                reversed,
+                hidden,
+                strikethrough,
+            } = sgr;
+
+            Self {
+                text,
+                start,
+                end,
+                fg,
+                bg,
+                intensity,
+                italic,
+                underline,
+                blink,
+                reversed,
+                hidden,
+                strikethrough,
+            }
         }
 
         const fn clone_style(&self, text: &'text str, start: usize, end: usize) -> Self {
@@ -536,7 +503,7 @@ pub mod v3 {
         }
 
         #[cfg(test)]
-        const fn default_style(text: &'text str, start: usize, end: usize) -> Self {
+        fn default_style(text: &'text str, start: usize, end: usize) -> Self {
             Self::with_sgr(SGR::default(), text, start, end)
         }
     }
