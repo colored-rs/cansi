@@ -10,42 +10,13 @@ const SEPARATOR: char = ';';
 ///
 /// Each different text slice is returned in order such that the text without the escape characters can be reconstructed.
 /// There is a helper function (`construct_text_no_codes`) on `CategorisedSlices` for this.
+#[deprecated = "please use v3::categorise_text to move to API v3.0. \
+                this function will be removed with v3.0 of cansi"]
 pub fn categorise_text(text: &str) -> CategorisedSlices {
-    let matches = parse(text);
-
-    let mut sgr = SGR::default();
-
-    let mut lo = 0;
-
-    // will always less than or equal to matches + 1 in length, see tests
-    let mut slices: Vec<CategorisedSlice> = Vec::with_capacity(matches.len() + 1);
-
-    for m in matches {
-        // add in the text before CSI with the previous SGR format
-        if m.start != lo {
-            slices.push(CategorisedSlice::with_sgr(
-                sgr,
-                &text[lo..m.start],
-                lo,
-                m.start,
-            ));
-        }
-
-        sgr = handle_seq(&m);
-
-        lo = m.end;
-    }
-
-    if lo != text.len() {
-        slices.push(CategorisedSlice::with_sgr(
-            sgr,
-            &text[lo..text.len()],
-            lo,
-            text.len(),
-        ));
-    }
-
-    slices
+    categorise_text_v3(text)
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
 /// Parses the text and returns each formatted slice in order.
