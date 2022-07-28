@@ -69,9 +69,7 @@ pub fn categorise_text_v3(text: &str) -> v3::CategorisedSlices {
 fn handle_seq(m: &Match) -> SGR {
     // the slice we want to process is skipped of first two bytes (ESC[) and last byte (terminating byte)
     let slice = &m.text[2..(m.text.len() - 1)];
-    slice
-        .split(SEPARATOR)
-        .fold(SGR::default(), |x, s| adjust_sgr(x, s))
+    slice.split(SEPARATOR).fold(SGR::default(), adjust_sgr)
 }
 
 /// Apply the style seq to the SGR. Maps decimal numbers according to

@@ -249,7 +249,7 @@ impl<'text, 'iter> Iterator for CategorisedLineIterator<'text, 'iter> {
             let (first, remainder) = split_on_new_line(slice.text);
 
             // push first slice on -- only if not empty
-            if first > 0 || v.len() == 0 {
+            if first > 0 || v.is_empty() {
                 v.push(slice.clone_style(&slice.text[..first], slice.start, slice.start + first));
             }
 
@@ -421,6 +421,7 @@ impl<'a> From<CategorisedSlice<'a>> for v3::CategorisedSlice<'a> {
 /// The formatting components `SGR (Select Graphic Rendition)`.
 /// [spec](https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters)
 #[derive(Clone, Copy, Default)]
+#[allow(clippy::upper_case_acronyms)]
 struct SGR {
     fg: Option<Color>,
     bg: Option<Color>,
@@ -472,7 +473,7 @@ pub enum Color {
 /// only require a change in import code.
 /// Note that version 3.0 will remove the deprecated version 2.0 items.
 pub mod v3 {
-    use super::{SGR, split_on_new_line};
+    use super::{split_on_new_line, SGR};
     pub use crate::{Color, Intensity};
 
     pub use super::categorise::categorise_text_v3 as categorise_text;
@@ -659,7 +660,7 @@ pub mod v3 {
                 let (first, remainder) = split_on_new_line(slice.text);
 
                 // push first slice on -- only if not empty
-                if first > 0 || v.len() == 0 {
+                if first > 0 || v.is_empty() {
                     v.push(slice.clone_style(
                         &slice.text[..first],
                         slice.start,
