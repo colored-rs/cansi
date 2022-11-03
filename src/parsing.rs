@@ -2,7 +2,7 @@
 use alloc::vec::Vec;
 
 /// A match.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Match<'t> {
     /// First byte index.
     pub start: usize,
@@ -50,6 +50,10 @@ pub fn parse(text: &str) -> Vec<Match> {
             }
 
             let end = end + 1;
+
+            if end > text.len() {
+                break;
+            }
 
             v.push(Match {
                 start,
@@ -113,5 +117,12 @@ mod tests {
                 }
             ]
         );
+    }
+
+    #[test]
+    fn malformed_escape() {
+        let x = parse("oops\x1b[\n");
+
+        assert_eq!(x, vec![]);
     }
 }
