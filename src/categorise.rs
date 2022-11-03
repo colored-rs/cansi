@@ -152,4 +152,26 @@ mod tests {
         let cat = categorise_text(&txt);
         assert!(matches.len() + 1 >= cat.len());
     }
+
+    #[test]
+    fn malformed_escapes() {
+        let x = categorise_text_v3("oops\x1b[\n");
+        assert_eq!(
+            x,
+            vec![v3::CategorisedSlice {
+                text: "oops\x1b[\n",
+                start: 0,
+                end: 7,
+                fg: None,
+                bg: None,
+                blink: None,
+                underline: None,
+                hidden: None,
+                intensity: None,
+                italic: None,
+                reversed: None,
+                strikethrough: None
+            }]
+        );
+    }
 }
